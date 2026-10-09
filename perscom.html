@@ -1,0 +1,502 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>UNKSO PERSCOM</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;800&family=Geist+Mono:wght@400;500&display=swap">
+<style>
+@font-face { font-family: "UNKSO Gilroy"; font-weight: 300; src: local("Gilroy-Light"), local("Gilroy Light"); }
+@font-face { font-family: "UNKSO Gilroy"; font-weight: 800; src: local("Gilroy-ExtraBold"), local("Gilroy ExtraBold"); }
+/* Layout: same "Command List" system as the Forums page. PERSCOM is read-only reference material,
+   so rows open documents rather than threads, and editing controls only appear for admins. */
+:root {
+  --ink: #07090D;
+  --panel: #0F131B;
+  --head: #161B25;
+  --row-hover: #141924;
+  --icon-bg: #1E2431;
+  --line: #222835;
+  --line-strong: #323A4A;
+  --fg: #F5F6F8;
+  --soft: #CDD2DB;
+  --muted: #A3AAB8;
+  --accent: #F07A2E;
+  --on-accent: #07090D;
+  --placeholder-a: #11151D;
+  --placeholder-b: #151A24;
+  --font-display: "UNKSO Gilroy", "Plus Jakarta Sans", system-ui, sans-serif;
+  --font-text: "UNKSO Gilroy", "Plus Jakarta Sans", system-ui, sans-serif;
+  --font-mono: "Geist Mono", ui-monospace, Menlo, monospace;
+  --w-light: 300;
+  --w-heavy: 800;
+  --maxw: 1320px;
+  --gutter: clamp(16px, 4vw, 32px);
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+:root { padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); }
+html { scroll-behavior: smooth; }
+body { margin: 0; background: var(--ink); color: var(--fg); font-family: var(--font-text); font-weight: var(--w-light); font-size: 16px; line-height: 1.55; -webkit-font-smoothing: antialiased; }
+img { max-width: 100%; }
+[hidden] { display: none !important; }
+a { color: inherit; }
+h1, h2, h3 { font-family: var(--font-display); margin: 0; text-wrap: balance; }
+p { margin: 0; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 6px; }
+.wrap { max-width: var(--maxw); margin-inline: auto; padding-inline: var(--gutter); }
+.mono { font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; }
+
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; padding: 0 20px; border-radius: 999px; border: 0; cursor: pointer; text-decoration: none; font-family: var(--font-display); font-weight: var(--w-heavy); font-size: 15px; transition: transform .2s ease, background-color .2s ease, border-color .2s ease; }
+.btn:hover { transform: translateY(-1px); }
+.btn-accent { background: var(--accent); color: var(--on-accent); }
+.btn-ghost { background: transparent; color: var(--fg); border: 1px solid var(--line-strong); }
+.btn-ghost:hover { border-color: var(--muted); }
+.btn-sm { min-height: 36px; padding: 0 14px; font-size: 13px; }
+
+/* ---------- Hero ---------- */
+.hero { position: relative; overflow: hidden; }
+.hero-media { position: absolute; inset: 0; background: repeating-linear-gradient(135deg, var(--placeholder-a) 0 18px, var(--placeholder-b) 18px 36px); }
+.hero-media span { position: absolute; top: 110px; right: var(--gutter); font-family: var(--font-mono); font-size: 12px; color: #7C8495; text-transform: uppercase; }
+.hero-shade { position: absolute; inset: 0; background: linear-gradient(to top, var(--ink) 0%, rgba(7,9,13,0.82) 45%, rgba(7,9,13,0.6) 100%); }
+.nav { position: relative; z-index: 3; display: flex; align-items: center; gap: 24px; padding-block: 24px; }
+.nav .logo img { display: block; height: 40px; width: auto; }
+.nav-links { display: flex; align-items: center; gap: 4px; margin: 0 0 0 auto; padding: 0; list-style: none; }
+.nav-links a { display: inline-flex; align-items: center; min-height: 44px; padding: 0 14px; text-decoration: none; color: #D5D9E0; font-size: 15px; }
+.nav-links a:hover, .nav-links a[aria-current="page"] { color: #FFFFFF; }
+.nav-links a[aria-current="page"] { box-shadow: inset 0 -2px 0 var(--accent); }
+.nav-links .btn { margin-left: 8px; }
+.menu-btn { display: none; margin-left: auto; width: 44px; height: 44px; border-radius: 999px; background: transparent; border: 1px solid rgba(243,244,246,0.35); color: var(--fg); cursor: pointer; align-items: center; justify-content: center; }
+.mobile-menu { position: relative; z-index: 3; margin-bottom: 16px; background: rgba(14,18,26,0.96); border: 1px solid var(--line); border-radius: 16px; padding: 8px; }
+.mobile-menu a { display: block; padding: 14px 16px; text-decoration: none; border-radius: 10px; }
+.mobile-menu a:hover { background: var(--head); }
+.mobile-menu .enlist { color: var(--accent); font-weight: var(--w-heavy); }
+
+.hero-body { position: relative; z-index: 2; padding-block: clamp(40px, 7vw, 88px) 40px; display: flex; flex-wrap: wrap; gap: 32px; align-items: flex-end; justify-content: space-between; }
+.hero-title { flex: 1 1 520px; min-width: 0; }
+.signal { display: inline-flex; align-items: center; gap: 12px; margin-bottom: 16px; color: var(--accent); }
+.signal::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--accent); }
+.hero h1 { font-weight: var(--w-light); color: var(--fg); font-size: clamp(44px, 6.6vw, 88px); line-height: 0.98; letter-spacing: -0.04em; }
+.hero h1 strong { font-weight: var(--w-heavy); color: var(--accent); letter-spacing: -0.035em; }
+.hero-title p { margin-top: 18px; color: var(--soft); max-width: 58ch; }
+.search { flex: 0 1 440px; min-width: 0; display: flex; flex-direction: column; gap: 10px; }
+.search-box { position: relative; }
+.search-box svg { position: absolute; left: 18px; top: 50%; transform: translateY(-50%); color: var(--muted); pointer-events: none; }
+.search input { width: 100%; min-height: 56px; padding: 0 18px 0 50px; border-radius: 999px; background: rgba(15,19,27,0.9); border: 1px solid var(--line-strong); color: var(--fg); font: inherit; font-size: 16px; }
+.search input::placeholder { color: #737B8B; }
+.search input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(240,122,46,0.22); }
+.search .hint { color: var(--muted); font-size: 13px; padding-left: 18px; }
+
+/* Jump bar */
+.jump { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: rgba(7,9,13,0.94); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border-block: 1px solid var(--line); }
+.jump-inner { display: flex; gap: 8px; overflow-x: auto; padding-block: 10px; scrollbar-width: none; }
+.jump-inner::-webkit-scrollbar { display: none; }
+.jump a { flex: none; display: inline-flex; align-items: center; gap: 10px; min-height: 40px; padding: 0 16px; border-radius: 999px; text-decoration: none; color: var(--soft); font-size: 14px; border: 1px solid var(--line); background: var(--panel); }
+.jump a:hover { color: var(--fg); border-color: var(--line-strong); }
+.jump a.active { color: var(--fg); border-color: var(--muted); }
+
+/* Read-only notice */
+.notice { display: flex; align-items: center; gap: 14px; padding: 16px 20px; border-radius: 14px; background: var(--panel); border: 1px solid var(--line); color: var(--soft); font-size: 15px; }
+.notice svg { flex: none; color: var(--muted); }
+.notice strong { color: var(--fg); font-family: var(--font-display); font-weight: var(--w-heavy); }
+
+/* ---------- Layout ---------- */
+.layout { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: clamp(28px, 3.5vw, 48px); padding-block: 40px 120px; align-items: start; }
+.sections { display: flex; flex-direction: column; gap: 32px; min-width: 0; }
+
+.category { scroll-margin-top: 76px; border: 1px solid var(--line); border-radius: 16px; overflow: hidden; background: var(--panel); }
+.cat-head { display: flex; align-items: center; gap: 18px; padding: 20px 24px; background: var(--head); color: #FFFFFF; }
+.cat-icon { flex: none; width: 52px; height: 52px; border-radius: 12px; display: grid; place-items: center; color: #FFFFFF; background: var(--icon-bg); border: 1px solid var(--line-strong); }
+.cat-text { flex: 1 1 auto; min-width: 0; }
+.cat-head h2 { font-weight: var(--w-heavy); font-size: clamp(24px, 2.4vw, 30px); letter-spacing: -0.02em; line-height: 1.1; color: #FFFFFF; }
+.cat-head p { color: var(--soft); margin-top: 4px; font-size: 15px; }
+.cat-status { flex: none; font-family: var(--font-mono); font-size: 12px; font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase; color: #FFFFFF; }
+.toggle { flex: none; width: 44px; height: 44px; border-radius: 999px; border: 1px solid var(--line-strong); background: transparent; color: #FFFFFF; cursor: pointer; display: grid; place-items: center; transition: transform .2s ease, border-color .2s ease; }
+.toggle:hover { border-color: var(--muted); background: rgba(255,255,255,0.06); }
+.category.collapsed .toggle { transform: rotate(-90deg); }
+.category.collapsed .cat-body { display: none; }
+
+.boards { list-style: none; margin: 0; padding: 0; }
+.row { position: relative; border-top: 1px solid var(--line); }
+.board-link { display: grid; grid-template-columns: 48px minmax(0, 1fr) 44px; gap: 20px; align-items: center; padding: 20px 24px; text-decoration: none; color: inherit; transition: background-color .15s ease; }
+.board-link:hover { background: var(--row-hover); }
+.b-icon { width: 48px; height: 48px; border-radius: 50%; display: grid; place-items: center; color: var(--soft); background: var(--icon-bg); }
+.b-main { min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+.b-title { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; font-family: var(--font-display); font-weight: var(--w-heavy); font-size: 19px; line-height: 1.25; color: var(--fg); }
+.b-desc { color: var(--muted); font-size: 15px; line-height: 1.45; }
+.subs { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+.subs span { font-size: 13px; color: var(--soft); padding: 3px 10px; border-radius: 999px; border: 1px solid var(--line-strong); }
+.b-go { width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center; border: 1px solid var(--line-strong); color: var(--muted); transition: border-color .15s ease, color .15s ease; }
+.board-link:hover .b-go { color: var(--fg); border-color: var(--muted); }
+.pill { display: inline-flex; align-items: center; gap: 5px; font-family: var(--font-mono); font-size: 11px; font-weight: 400; letter-spacing: 0.05em; text-transform: uppercase; padding: 3px 8px; border-radius: 999px; color: var(--soft); background: #252C3A; }
+.pill.new { background: var(--accent); color: var(--on-accent); font-weight: 500; }
+.board-link.is-new .b-icon { background: var(--accent); color: var(--on-accent); }
+
+/* Admin-only controls (hidden for members) */
+.admin-only { display: none !important; }
+body.admin .admin-only { display: inline-flex !important; }
+.row-edit { position: absolute; top: 50%; right: 84px; transform: translateY(-50%); }
+body.admin .b-main { padding-right: 84px; }
+@media (max-width: 600px) { body.admin .b-main { padding-right: 0; } }
+.add-row { display: none; border-top: 1px solid var(--line); }
+body.admin .add-row { display: block; }
+.add-row button { width: 100%; display: flex; align-items: center; gap: 12px; padding: 16px 24px; background: transparent; border: 0; color: var(--muted); font: inherit; font-size: 15px; cursor: pointer; text-align: left; }
+.add-row button:hover { color: var(--fg); background: var(--row-hover); }
+.add-row .plus { width: 32px; height: 32px; border-radius: 50%; border: 1px dashed var(--line-strong); display: grid; place-items: center; margin-left: 8px; margin-right: 16px; }
+
+.no-results { padding: 48px 24px; text-align: center; color: var(--muted); border: 1px dashed var(--line-strong); border-radius: 16px; }
+.no-results strong { display: block; color: var(--fg); font-family: var(--font-display); font-weight: var(--w-heavy); font-size: 18px; margin-bottom: 4px; }
+mark { background: rgba(240,122,46,0.3); color: inherit; border-radius: 3px; padding: 0 2px; }
+
+/* ---------- Rail ---------- */
+.rail { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 76px); display: flex; flex-direction: column; gap: 16px; }
+.panel { padding: 22px; border-radius: 16px; background: var(--panel); border: 1px solid var(--line); }
+.panel h2 { font-weight: var(--w-heavy); font-size: 18px; margin-bottom: 14px; }
+.panel p { color: var(--muted); font-size: 14px; }
+.seg { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); padding: 4px; border-radius: 999px; background: var(--ink); border: 1px solid var(--line-strong); margin-bottom: 12px; }
+.seg button { min-height: 38px; border-radius: 999px; border: 0; background: transparent; color: var(--soft); font: inherit; font-size: 14px; cursor: pointer; }
+.seg button[aria-pressed="true"] { background: var(--icon-bg); color: var(--fg); font-family: var(--font-display); font-weight: var(--w-heavy); }
+.update-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 2px; }
+.update-list a { display: grid; grid-template-columns: 8px minmax(0, 1fr); gap: 12px; align-items: center; padding: 8px 10px; border-radius: 8px; text-decoration: none; color: var(--soft); font-size: 15px; }
+.update-list a::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--accent); }
+.update-list a:hover { background: var(--head); color: var(--fg); }
+.update-list small { display: block; color: var(--muted); font-size: 13px; }
+.links { list-style: none; margin: 0; padding: 0; }
+.links a { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 44px; padding: 0 4px; border-top: 1px solid var(--line); text-decoration: none; color: var(--soft); font-size: 15px; }
+.links li:first-child a { border-top: 0; }
+.links a:hover { color: var(--fg); }
+
+footer { border-top: 1px solid var(--line); }
+.foot { display: flex; flex-wrap: wrap; gap: 16px 32px; justify-content: space-between; padding-block: 32px; color: var(--muted); font-size: 15px; }
+.foot nav { display: flex; flex-wrap: wrap; gap: 8px 24px; }
+.foot a { color: var(--soft); text-decoration: none; }
+.foot a:hover { color: var(--fg); }
+
+/* Toast */
+.toast { position: fixed; left: 50%; bottom: calc(env(safe-area-inset-bottom, 0px) + 24px); transform: translateX(-50%); z-index: 20; padding: 12px 18px; border-radius: 999px; background: var(--fg); color: var(--ink); font-size: 14px; box-shadow: 0 10px 30px rgba(0,0,0,0.4); }
+
+@media (max-width: 1100px) {
+  .layout { grid-template-columns: minmax(0, 1fr); }
+  .rail { position: static; display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
+}
+@media (max-width: 860px) {
+  .nav-links { display: none; }
+  .menu-btn { display: inline-flex; }
+}
+@media (max-width: 600px) {
+  .cat-head { flex-wrap: wrap; padding: 18px; gap: 14px; }
+  .cat-icon { width: 44px; height: 44px; }
+  .cat-status { order: 4; width: 100%; padding-left: 58px; }
+  .board-link { grid-template-columns: 40px minmax(0, 1fr); gap: 14px; padding: 16px 18px; }
+  .b-icon { width: 40px; height: 40px; }
+  .b-go { display: none; }
+  .row-edit { position: static; transform: none; margin: 0 18px 14px 72px; }
+}
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } * { transition: none !important; } }
+.foot { align-items: center; }
+.to-top { display: inline-flex; align-items: center; gap: 10px; min-height: 44px; padding: 0 20px; border-radius: 999px; background: transparent; border: 1px solid #323A4A; color: #F5F6F8; font-family: var(--font-display); font-weight: 800; font-size: 15px; cursor: pointer; transition: border-color .2s ease, transform .2s ease; }
+.to-top:hover { border-color: #A3AAB8; transform: translateY(-1px); }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="hero-media" aria-hidden="true" data-img="images/header-perscom.jpg"><span>Still from clan footage</span></div>
+  <div class="hero-shade" aria-hidden="true"></div>
+  <div class="wrap" style="position: relative; z-index: 3;">
+    <nav class="nav" aria-label="Main">
+      <a class="logo" href="./" aria-label="UNKSO home"><img src="unkso-logo.png" alt="UNKSO" width="160" height="40"></a>
+      <ul class="nav-links">
+        <li><a href="./#unit">The Clan</a></li>
+        <li><a href="./#divisions">Companies</a></li>
+        <li><a href="forums.html">Forums</a></li>
+        <li><a href="perscom.html" aria-current="page">PERSCOM</a></li>
+        <li><a href="admin.html" aria-label="Sign in" title="Sign in"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg></a></li>
+        <li><a class="btn btn-ghost" href="apply.html">Enlist</a></li>
+      </ul>
+      <button class="menu-btn" id="menu-btn" type="button" aria-expanded="false" aria-controls="mobile-menu" aria-label="Open menu">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+      </button>
+    </nav>
+    <div class="mobile-menu" id="mobile-menu" hidden>
+      <a href="./#unit">The Clan</a>
+      <a href="./#divisions">Companies</a>
+      <a href="forums.html">Forums</a>
+      <a href="perscom.html" aria-current="page">PERSCOM</a>
+      <a href="admin.html" style="display: flex; align-items: center; gap: 10px;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>Sign in</a>
+      <a class="enlist" href="apply.html">Enlist</a>
+    </div>
+  </div>
+  <div class="wrap hero-body">
+    <div class="hero-title">
+      <div class="signal mono">Personnel Command · Official record</div>
+      <h1><strong>UNKSO</strong> PERSCOM.</h1>
+      <p>How the clan is organised, the regulations we follow, our ranks and awards, and the documents every member should know.</p>
+    </div>
+    <div class="search" role="search">
+      <label for="p-search" class="mono" style="color: var(--soft); padding-left: 18px;">Find in PERSCOM</label>
+      <div class="search-box">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg>
+        <input type="search" id="p-search" placeholder="e.g. promotion, leave, BCT" autocomplete="off">
+      </div>
+      <p class="hint" id="search-status" aria-live="polite">Search titles and descriptions.</p>
+    </div>
+  </div>
+</header>
+
+<nav class="jump" aria-label="PERSCOM sections">
+  <div class="wrap jump-inner" id="jump"></div>
+</nav>
+
+<main class="wrap layout">
+  <div class="sections">
+    <div class="notice" role="note">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+      <span><strong>Read only.</strong> PERSCOM is kept up to date by Command and staff. Spotted something out of date? Let your Squad Leader know or ask in <a href="forums.html#general">General Discussion</a>.</span>
+    </div>
+    <div class="sections" id="index"></div>
+  </div>
+
+  <aside class="rail" aria-label="PERSCOM sidebar">
+    <section class="panel" aria-labelledby="view-title">
+      <h2 id="view-title">Preview as</h2>
+      <div class="seg" role="group" aria-label="Preview as">
+        <button type="button" id="view-member" aria-pressed="true">Member</button>
+        <button type="button" id="view-admin" aria-pressed="false">Admin</button>
+      </div>
+      <p id="view-note">Members can read everything here. Switch to Admin to see the editing controls.</p>
+    </section>
+
+    <section class="panel" aria-labelledby="updated-title">
+      <h2 id="updated-title">Recently updated</h2>
+      <ul class="update-list" id="update-list"></ul>
+    </section>
+
+    <section class="panel">
+      <h2>Most used</h2>
+      <ul class="links">
+        <li><a href="#regulations">All Regulations <span aria-hidden="true">→</span></a></li>
+        <li><a href="#ranks">Promotion Requirements <span aria-hidden="true">→</span></a></li>
+        <li><a href="#organisation">Full Member Roster <span aria-hidden="true">→</span></a></li>
+        <li><a href="#documents">Handbooks <span aria-hidden="true">→</span></a></li>
+      </ul>
+    </section>
+  </aside>
+</main>
+
+<footer>
+  <div class="wrap foot">
+    <span>© Unknown Soldiers · Built by our Engineering Department</span>
+    <button class="to-top" type="button" onclick="window.scrollTo({ top: 0, behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' })">
+      Back to top
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5M6 11l6-6 6 6"/></svg>
+    </button>
+  </div>
+</footer>
+
+<div class="toast" id="toast" role="status" hidden></div>
+
+<script>
+(function () {
+  var I = {
+    sitemap: '<rect x="9" y="3" width="6" height="5" rx="1"/><rect x="2" y="16" width="6" height="5" rx="1"/><rect x="16" y="16" width="6" height="5" rx="1"/><path d="M12 8v4M5 16v-4h14v4"/>',
+    book: '<path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2Z"/><path d="M4 19V5M8 7h7"/>',
+    chevrons: '<path d="m6 14 6-5 6 5M6 19l6-5 6 5"/>',
+    medal: '<path d="M8 3h8l-2 6h-4Z"/><circle cx="12" cy="15" r="6"/>',
+    file: '<path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8Z"/><path d="M14 3v5h5M9 13h6M9 17h6"/>',
+    star: '<path d="m12 3 2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9Z"/>',
+    link: '<path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/>',
+    shield: '<path d="M12 3 4 6v6c0 5 3.5 8 8 9 4.5-1 8-4 8-9V6Z"/>',
+    users: '<circle cx="9" cy="8" r="3.5"/><path d="M2 20c.8-3.4 3.6-5.5 7-5.5s6.2 2.1 7 5.5"/><path d="M16 4.5a3.5 3.5 0 0 1 0 7M18.5 14.8c1.8.8 3 2.6 3.5 5.2"/>',
+    building: '<rect x="4" y="3" width="16" height="18" rx="1"/><path d="M9 7h1M14 7h1M9 11h1M14 11h1M9 15h1M14 15h1M10 21v-3h4v3"/>',
+    list: '<path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/>',
+    handshake: '<path d="M3 12 7 8l4 2 3-3 7 5"/><path d="m3 12 6 6 2-1 2 2 2-1 2 1 4-4"/>',
+    clock: '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+    plane: '<path d="M2 16 22 8l-4 10-5-3-3 4v-5l8-6"/>',
+    gavel: '<path d="m14 13-7.5 7.5a2.1 2.1 0 0 1-3-3L11 10M16 16l6-6M8 8l6-6M9 7l8 8"/>',
+    chevron1: '<path d="m6 15 6-5 6 5"/>',
+    chevron3: '<path d="m6 10 6-5 6 5M6 15l6-5 6 5M6 20l6-5 6 5"/>',
+    bars: '<path d="M8 4v16M16 4v16"/>',
+    trend: '<path d="M3 17 9 11l4 4 8-8"/><path d="M15 7h6v6"/>',
+    ribbon: '<rect x="3" y="8" width="18" height="8" rx="1"/><path d="M9 8v8M15 8v8"/>',
+    badge: '<circle cx="12" cy="10" r="6"/><path d="m9 15-2 6 5-3 5 3-2-6"/>',
+    check: '<circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/>',
+    compass: '<circle cx="12" cy="12" r="9"/><path d="m15.5 8.5-2 5-5 2 2-5Z"/>',
+    target: '<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/>',
+    clipboard: '<rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4V3h6v1M9 10h6M9 14h6M9 18h3"/>',
+    history: '<path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5M12 7v5l4 2"/>',
+    arrow: '<path d="M5 12h14M13 6l6 6-6 6"/>',
+    pencil: '<path d="M4 20h4L19 9l-4-4L4 16Z"/><path d="m13.5 6.5 4 4"/>',
+    plus: '<path d="M12 5v14M5 12h14"/>'
+  };
+  function svg(name, size, sw) {
+    size = size || 22;
+    return '<svg width="' + size + '" height="' + size + '" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="' + (sw || 1.9) + '" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + I[name] + '</svg>';
+  }
+
+  // updated: sample "recently updated" state for the mockup (shown in orange).
+  var CATEGORIES = [
+    { id: 'organisation', icon: 'sitemap', title: 'Clan Organisation', desc: 'Who leads the clan, how it is structured and who is in each company.', items: [
+      { id: 'roster', icon: 'users', title: 'Full Member Roster', desc: 'Every active member with their rank, company and time in service.', updated: 'Roster updated with new recruits' },
+      { id: 'coc', icon: 'sitemap', title: 'Chain of Command', desc: 'Command Staff and who reports to whom, from Command down to squad level.' },
+      { id: 'companies', icon: 'shield', title: 'Companies', desc: 'Leadership and squads for each company.', subs: ['Modern Warfare 4', 'Battlefield 6', 'Escape From Tarkov'] },
+      { id: 'departments', icon: 'building', title: 'Departments', desc: 'Recruitment, Engineering and the other staff departments that keep the clan running.' }
+    ]},
+    { id: 'regulations', icon: 'book', title: 'Regulations', desc: 'The rules every member agrees to follow. Read these before your first FTX.', items: [
+      { id: 'all-regs', icon: 'book', title: 'All Regulations', desc: 'The full UNKSO regulations: code of conduct, activity and attendance, and disciplinary procedure.', updated: 'Attendance rules revised' },
+      { id: 'customs', icon: 'target', title: 'Customs & Courtesies', desc: 'Military customs we keep, from addressing ranks to comms discipline.' },
+      { id: 'leave', icon: 'plane', title: 'Leave, Discharge & Retirement Policy', desc: 'How to request leave, transfer between companies, take a discharge or retire from the clan.' }
+    ]},
+    { id: 'ranks', icon: 'chevrons', title: 'Ranks', desc: 'The rank structure, what each rank is responsible for and how to earn the next one.', items: [
+      { id: 'enlisted', icon: 'chevron1', title: 'Enlisted Ranks', desc: 'From Recruit through the junior enlisted ranks, with insignia.' },
+      { id: 'nco', icon: 'chevron3', title: 'Non-Commissioned Officers', desc: 'NCO ranks and their responsibilities as squad and team leaders.' },
+      { id: 'officers', icon: 'bars', title: 'Officers', desc: 'Officer ranks and their roles in running companies and the clan.' },
+      { id: 'promotion', icon: 'trend', title: 'Promotion Requirements', desc: 'Time in service, attendance and training needed for each promotion.', updated: 'Requirements updated for NCO ranks' }
+    ]},
+    { id: 'awards', icon: 'medal', title: 'Awards', desc: 'Every award the clan gives, what it looks like and how it is earned.', items: [
+      { id: 'ribbons', icon: 'ribbon', title: 'Ribbons', desc: 'Ribbons for service, campaigns and contributions to the clan.' },
+      { id: 'medals', icon: 'medal', title: 'Awards & Medals', desc: 'Awards and medals for outstanding service and leadership, and how each is earned.' },
+      { id: 'badges', icon: 'badge', title: 'Badges', desc: 'Badges earned through training and specialist roles.' }
+    ]},
+    { id: 'documents', icon: 'file', title: 'Documents', desc: 'Handbooks, guides and templates for members and leaders.', items: [
+      { id: 'handbooks', icon: 'compass', title: 'Handbooks', desc: 'Handbooks for new members and leaders, covering everything you need in your first month and beyond.' },
+      { id: 'bct', icon: 'target', title: 'BCT Guides', desc: 'Basic Combat Training syllabus and what recruits are assessed on.', updated: 'New module added' },
+      { id: 'nco-club', icon: 'chevrons', title: 'NCO Club', desc: 'Guides and resources for Non-Commissioned Officers.' },
+      { id: 'history', icon: 'history', title: 'Clan History', desc: 'The Unknown Soldiers story, from 2004 to today.' }
+    ]}
+  ];
+
+  function esc(s) { return String(s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+  function hl(text, q) {
+    var safe = esc(text);
+    if (!q) return safe;
+    var re = new RegExp('(' + esc(q).replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ')', 'ig');
+    return safe.replace(re, '<mark>$1</mark>');
+  }
+  function matches(text, q) { return !q || text.toLowerCase().indexOf(q) !== -1; }
+
+  var collapsed = {};
+  try { collapsed = JSON.parse(localStorage.getItem('unkso-perscom-collapsed') || '{}') || {}; } catch (e) { collapsed = {}; }
+  function saveCollapsed() { try { localStorage.setItem('unkso-perscom-collapsed', JSON.stringify(collapsed)); } catch (e) {} }
+
+  function itemHTML(it, q) {
+    var subs = it.subs ? '<span class="subs">' + it.subs.map(function (s) { return '<span>' + hl(s, q) + '</span>'; }).join('') + '</span>' : '';
+    return '<li class="row"><a class="board-link' + (it.updated ? ' is-new' : '') + '" href="#" data-item="' + it.id + '">' +
+      '<span class="b-icon">' + svg(it.icon) + '</span>' +
+      '<span class="b-main"><span class="b-title">' + hl(it.title, q) +
+        (it.updated ? '<span class="pill new">Updated</span>' : '') +
+        (it.tag ? '<span class="pill">' + esc(it.tag) + '</span>' : '') + '</span>' +
+      '<span class="b-desc">' + hl(it.desc, q) + '</span>' + subs + '</span>' +
+      '<span class="b-go">' + svg('arrow', 18, 2.2) + '</span></a>' +
+      '<button type="button" class="btn btn-ghost btn-sm admin-only row-edit" data-edit="' + esc(it.title) + '">' + svg('pencil', 14, 2) + 'Edit</button>' +
+      '</li>';
+  }
+
+  var index = document.getElementById('index');
+  var jump = document.getElementById('jump');
+  var status = document.getElementById('search-status');
+
+  function render(q) {
+    var ql = (q || '').trim().toLowerCase();
+    var html = '', total = 0, jumpHTML = '';
+    CATEGORIES.forEach(function (cat) {
+      var list = cat.items.filter(function (it) { return matches(it.title + ' ' + it.desc + ' ' + (it.subs || []).join(' ') + ' ' + cat.title, ql); });
+      if (!list.length) return;
+      total += list.length;
+      var isCollapsed = !ql && collapsed[cat.id];
+      var n = cat.items.length;
+      html += '<section class="category' + (isCollapsed ? ' collapsed' : '') + '" id="' + cat.id + '" aria-labelledby="h-' + cat.id + '">' +
+        '<div class="cat-head"><span class="cat-icon">' + svg(cat.icon, 26, 2.1) + '</span>' +
+        '<div class="cat-text"><h2 id="h-' + cat.id + '">' + esc(cat.title) + '</h2><p>' + esc(cat.desc) + '</p></div>' +
+        '<span class="cat-status">' + n + ' pages</span>' +
+        '<button class="toggle" type="button" data-cat="' + cat.id + '" aria-expanded="' + (!isCollapsed) + '" aria-controls="b-' + cat.id + '" aria-label="' + (isCollapsed ? 'Expand ' : 'Collapse ') + esc(cat.title) + '">' +
+        '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button></div>' +
+        '<div class="cat-body" id="b-' + cat.id + '"><ul class="boards">' + list.map(function (it) { return itemHTML(it, ql); }).join('') + '</ul>' +
+        '<div class="add-row"><button type="button" data-add="' + esc(cat.title) + '"><span class="plus">' + svg('plus', 14, 2.2) + '</span>Add a page to ' + esc(cat.title) + '</button></div>' +
+        '</div></section>';
+      jumpHTML += '<a href="#' + cat.id + '" data-jump="' + cat.id + '">' + esc(cat.title) + '</a>';
+    });
+    if (!total) html = '<div class="no-results"><strong>Nothing matches “' + esc(q.trim()) + '”</strong>Try another word, such as “promotion”, “leave” or “handbook”.</div>';
+    index.innerHTML = html;
+    jump.innerHTML = jumpHTML;
+    status.textContent = ql ? (total ? total + (total === 1 ? ' page matches.' : ' pages match.') : 'Nothing matches.') : 'Search titles and descriptions.';
+    observe();
+  }
+
+  // Recently updated list
+  var ul = document.getElementById('update-list');
+  var upd = [];
+  CATEGORIES.forEach(function (c) { c.items.forEach(function (it) { if (it.updated) upd.push({ c: c, it: it }); }); });
+  ul.innerHTML = upd.map(function (u) { return '<li><a href="#' + u.c.id + '"><span>' + esc(u.it.title) + '<small>' + esc(u.it.updated) + '</small></span></a></li>'; }).join('');
+
+  // Toast
+  var toast = document.getElementById('toast'), tt;
+  function say(msg) { toast.textContent = msg; toast.hidden = false; clearTimeout(tt); tt = setTimeout(function () { toast.hidden = true; }, 2600); }
+
+  index.addEventListener('click', function (e) {
+    var btn = e.target.closest('.toggle');
+    if (btn) {
+      var id = btn.getAttribute('data-cat');
+      var sec = document.getElementById(id);
+      var now = !sec.classList.contains('collapsed');
+      sec.classList.toggle('collapsed', now);
+      btn.setAttribute('aria-expanded', String(!now));
+      btn.setAttribute('aria-label', (now ? 'Expand ' : 'Collapse ') + sec.querySelector('h2').textContent);
+      collapsed[id] = now; saveCollapsed();
+      return;
+    }
+    var ed = e.target.closest('[data-edit]');
+    if (ed) { say('Mockup: this would open the editor for “' + ed.getAttribute('data-edit') + '”.'); return; }
+    var add = e.target.closest('[data-add]');
+    if (add) { say('Mockup: this would add a new page to ' + add.getAttribute('data-add') + '.'); return; }
+    var link = e.target.closest('.board-link');
+    if (link) { e.preventDefault(); say('Mockup: this would open the page.'); }
+  });
+  jump.addEventListener('click', function (e) {
+    var a = e.target.closest('a[data-jump]');
+    if (!a) return;
+    var sec = document.getElementById(a.getAttribute('data-jump'));
+    if (sec && sec.classList.contains('collapsed')) sec.querySelector('.toggle').click();
+  });
+
+  // Member / Admin preview
+  var vm = document.getElementById('view-member'), va = document.getElementById('view-admin'), note = document.getElementById('view-note');
+  function setView(admin) {
+    document.body.classList.toggle('admin', admin);
+    vm.setAttribute('aria-pressed', String(!admin));
+    va.setAttribute('aria-pressed', String(admin));
+    note.textContent = admin
+      ? 'Admins see Edit on every page and can add new pages to any section. Members never see these controls.'
+      : 'Members can read everything here. Switch to Admin to see the editing controls.';
+  }
+  vm.addEventListener('click', function () { setView(false); });
+  va.addEventListener('click', function () { setView(true); });
+
+  var io = null;
+  function observe() {
+    if (!('IntersectionObserver' in window)) return;
+    if (io) io.disconnect();
+    io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) {
+        if (!en.isIntersecting) return;
+        jump.querySelectorAll('a').forEach(function (a) { a.classList.toggle('active', a.getAttribute('data-jump') === en.target.id); });
+      });
+    }, { rootMargin: '-30% 0px -60% 0px' });
+    index.querySelectorAll('.category').forEach(function (s) { io.observe(s); });
+  }
+
+  var search = document.getElementById('p-search');
+  search.addEventListener('input', function () { render(search.value); });
+  render(search.value);
+
+  var mb = document.getElementById('menu-btn'), mm = document.getElementById('mobile-menu');
+  function setOpen(open) { mm.hidden = !open; mb.setAttribute('aria-expanded', String(open)); mb.setAttribute('aria-label', open ? 'Close menu' : 'Open menu'); }
+  mb.addEventListener('click', function () { setOpen(mm.hidden); });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape') setOpen(false); });
+})();
+</script>
+<script src="js/images.js"></script>
+</body>
+</html>

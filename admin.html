@@ -1,0 +1,783 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>UNKSO Console</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;800&family=Geist+Mono:wght@400;500&display=swap">
+<style>
+@font-face { font-family: "UNKSO Gilroy"; font-weight: 300; src: local("Gilroy-Light"), local("Gilroy Light"); }
+@font-face { font-family: "UNKSO Gilroy"; font-weight: 800; src: local("Gilroy-ExtraBold"), local("Gilroy ExtraBold"); }
+/* Layout: "Admin Table" console. Sidebar nav, company tabs over a selectable member table, edit panel on the right. */
+:root {
+  --ink: #07090D;
+  --side: #0B0E14;
+  --panel: #0F131B;
+  --head: #161B25;
+  --row-hover: #141924;
+  --row-sel: #151922;
+  --row-open: #1A202B;
+  --chip: #252C3A;
+  --field: #0B0E14;
+  --line: #222835;
+  --line-strong: #323A4A;
+  --fg: #F5F6F8;
+  --soft: #CDD2DB;
+  --muted: #A3AAB8;
+  --faint: #737B8B;
+  --accent: #F07A2E;
+  --on-accent: #07090D;
+  --bulk-bg: #2A1A10;
+  --bulk-line: #4A2C18;
+  --bulk-btn: #5A3A24;
+  --ok-bg: #16301F; --ok: #7FD19B;
+  --loa-bg: #3A3320; --loa: #E8C26A;
+  --danger: #FF8A7A;
+  --font-display: "UNKSO Gilroy", "Plus Jakarta Sans", system-ui, sans-serif;
+  --font-text: "UNKSO Gilroy", "Plus Jakarta Sans", system-ui, sans-serif;
+  --font-mono: "Geist Mono", ui-monospace, Menlo, monospace;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html, body { height: 100%; }
+:root { padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); }
+body { margin: 0; background: var(--ink); color: var(--fg); font-family: var(--font-text); font-weight: 300; font-size: 15px; line-height: 1.5; -webkit-font-smoothing: antialiased; }
+img { max-width: 100%; }
+[hidden] { display: none !important; }
+a { color: inherit; }
+h1, h2, h3 { font-family: var(--font-display); margin: 0; text-wrap: balance; }
+p { margin: 0; }
+button, input, select { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px; }
+.mono { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 42px; padding: 0 18px; border-radius: 999px; border: 0; cursor: pointer; text-decoration: none; font-family: var(--font-display); font-weight: 800; font-size: 14px; white-space: nowrap; transition: transform .15s ease, border-color .15s ease; }
+.btn:hover { transform: translateY(-1px); }
+.btn-accent { background: var(--accent); color: var(--on-accent); }
+.btn-ghost { background: transparent; color: var(--fg); border: 1px solid var(--line-strong); }
+.btn-ghost:hover { border-color: var(--muted); }
+.btn-danger { background: transparent; color: var(--danger); border: 1px solid rgba(255,138,122,0.5); }
+.btn-danger:hover { border-color: var(--danger); }
+.btn-danger-solid { background: var(--danger); color: var(--ink); }
+.btn-sm { min-height: 34px; padding: 0 12px; font-size: 13px; }
+
+/* ---------- Sign-in / no access ---------- */
+.gate { min-height: 100%; display: grid; place-items: center; padding: 32px 16px; }
+.gate-card { width: min(560px, 100%); padding: 32px; border-radius: 16px; background: var(--panel); border: 1px solid var(--line); display: flex; flex-direction: column; gap: 18px; }
+.gate-card img { height: 36px; width: auto; align-self: flex-start; }
+.gate-card h1 { font-weight: 300; font-size: 40px; letter-spacing: -0.04em; line-height: 1; }
+.gate-card h1 strong { font-weight: 800; color: var(--accent); }
+.gate-card p { color: var(--muted); }
+.roles { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.role-opt { position: relative; display: flex; flex-direction: column; gap: 4px; padding: 14px; border-radius: 12px; border: 1px solid var(--line-strong); background: var(--field); cursor: pointer; }
+.role-opt input { position: absolute; opacity: 0; }
+.role-opt strong { font-family: var(--font-display); font-weight: 800; }
+.role-opt span { color: var(--muted); font-size: 13px; line-height: 1.4; }
+.role-opt:has(input:checked) { border-color: var(--accent); background: rgba(240,122,46,0.08); }
+.role-opt:has(input:focus-visible) { box-shadow: 0 0 0 3px rgba(240,122,46,0.35); }
+
+/* ---------- Fields ---------- */
+.field { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.field > label, .field > .label { font-family: var(--font-display); font-weight: 800; font-size: 13px; }
+.opt { font-family: var(--font-text); font-weight: 300; color: var(--muted); }
+.input, select.input { width: 100%; min-height: 44px; padding: 0 12px; border-radius: 8px; background: var(--field); border: 1px solid var(--line-strong); color: var(--fg); font-size: 15px; }
+select.input { appearance: none; -webkit-appearance: none; padding-right: 36px; cursor: pointer;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23A3AAB8' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 12px center; }
+.input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(240,122,46,0.22); }
+.input[aria-invalid="true"] { border-color: var(--danger); }
+.err { color: var(--danger); font-size: 13px; }
+
+/* ---------- App shell ---------- */
+.app { display: flex; flex-wrap: wrap; min-height: 100%; }
+.side { flex: 1 1 232px; max-width: 100%; padding: 22px 14px; background: var(--side); border-right: 1px solid var(--line); display: flex; flex-direction: column; gap: 22px; }
+.side .logo img { display: block; height: 34px; width: auto; margin: 0 8px; }
+.side nav { display: flex; flex-direction: column; gap: 2px; }
+.back-site { display: flex; align-items: center; justify-content: center; gap: 10px; min-height: 44px; padding: 0 16px; border-radius: 999px; border: 1px solid var(--line-strong); background: var(--panel); color: var(--fg); text-decoration: none; font-family: var(--font-display); font-weight: 800; font-size: 14px; transition: border-color .15s ease, transform .15s ease; }
+.back-site:hover { border-color: var(--accent); transform: translateY(-1px); }
+.back-site svg { color: var(--accent); }
+.gate-card .back-site { align-self: flex-start; }
+.side .group { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--faint); padding: 6px 12px; }
+.side .group + .group, .side a + .group, .side button + .group { padding-top: 18px; }
+.nav-item { display: flex; align-items: center; gap: 12px; min-height: 42px; padding: 0 12px; border-radius: 8px; text-decoration: none; color: var(--soft); background: transparent; border: 0; width: 100%; text-align: left; cursor: pointer; font-size: 15px; }
+.nav-item:hover { background: var(--row-hover); color: var(--fg); }
+.nav-item[aria-current="page"] { color: #FFFFFF; background: var(--row-open); box-shadow: inset 2px 0 0 var(--accent); font-family: var(--font-display); font-weight: 800; }
+.nav-item[aria-current="page"] svg { color: var(--accent); }
+.nav-item[aria-disabled="true"] { color: var(--faint); cursor: default; }
+.nav-item[aria-disabled="true"]:hover { background: transparent; }
+.nav-item .count { margin-left: auto; font-family: var(--font-mono); font-size: 11px; padding: 2px 8px; border-radius: 999px; background: var(--chip); color: var(--soft); }
+.nav-item .soon { margin-left: auto; font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--faint); }
+.me { margin-top: auto; display: flex; flex-direction: column; gap: 10px; padding: 12px; border-radius: 12px; background: var(--panel); border: 1px solid var(--line); }
+.me-row { display: flex; align-items: center; gap: 10px; }
+.avatar { flex: none; width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; background: var(--chip); font-family: var(--font-display); font-weight: 800; font-size: 12px; color: var(--soft); }
+.me strong { display: block; font-family: var(--font-display); font-weight: 800; font-size: 14px; }
+.me small { display: block; font-size: 12px; color: var(--muted); }
+.me .links { display: flex; flex-wrap: wrap; gap: 6px; }
+
+.main { flex: 999 1 640px; min-width: 0; display: flex; flex-wrap: wrap; align-items: stretch; }
+.content { flex: 999 1 560px; min-width: 0; padding: 26px 28px 48px; }
+.page-head { display: flex; flex-wrap: wrap; align-items: center; gap: 14px; margin-bottom: 18px; }
+.page-head .title { flex: 1 1 260px; }
+.page-head .crumb { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+.page-head h1 { margin-top: 4px; font-weight: 800; font-size: 34px; letter-spacing: -0.03em; line-height: 1.1; }
+.search { display: flex; align-items: center; gap: 10px; min-height: 42px; padding: 0 14px; border-radius: 999px; background: var(--panel); border: 1px solid var(--line-strong); color: var(--muted); flex: 0 1 260px; }
+.search input { flex: 1; min-width: 0; background: transparent; border: 0; color: var(--fg); }
+.search input:focus { outline: none; }
+.search:focus-within { border-color: var(--accent); }
+.demo { display: flex; gap: 10px; align-items: flex-start; padding: 10px 14px; border-radius: 10px; border: 1px dashed var(--line-strong); color: var(--muted); font-size: 13px; margin-bottom: 18px; }
+.demo svg { flex: none; margin-top: 2px; color: var(--accent); }
+.demo strong { color: var(--soft); }
+
+.toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-bottom: 16px; }
+.tab { display: inline-flex; align-items: center; gap: 10px; min-height: 42px; padding: 0 16px; border-radius: 10px; font-size: 14px; background: var(--panel); color: var(--fg); border: 1px solid var(--line); cursor: pointer; }
+.tab strong { font-family: var(--font-display); font-weight: 800; }
+.tab .game { color: var(--muted); }
+.tab .n { font-family: var(--font-mono); font-size: 11px; padding: 2px 7px; border-radius: 999px; background: var(--chip); color: var(--soft); }
+.tab[aria-selected="true"] { background: var(--head); border-color: var(--accent); }
+.tab[aria-selected="true"] .n { background: var(--accent); color: var(--on-accent); }
+.toolbar .spacer { flex: 1; }
+.status-filter { display: inline-flex; align-items: center; gap: 8px; color: var(--muted); font-size: 14px; }
+.status-filter select { min-height: 38px; width: auto; }
+
+.table-card { border-radius: 14px; border: 1px solid var(--line); overflow: hidden; background: var(--panel); }
+.bulk { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; padding: 10px 16px; background: var(--bulk-bg); border-bottom: 1px solid var(--bulk-line); font-size: 14px; }
+.bulk strong { font-family: var(--font-display); font-weight: 800; color: var(--accent); margin-right: 4px; }
+.bulk .btn-ghost { border-color: var(--bulk-btn); }
+.bulk select.input { min-height: 34px; width: auto; font-size: 13px; background-color: var(--ink); }
+.bulk .confirm { color: var(--fg); }
+.table-wrap { overflow-x: auto; position: relative; }
+table { width: 100%; border-collapse: collapse; min-width: 720px; }
+th { text-align: left; font-family: var(--font-mono); font-size: 11px; font-weight: 400; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); padding: 12px 8px; }
+th:first-child, td:first-child { padding-left: 16px; width: 20px; }
+th:last-child, td:last-child { padding-right: 16px; text-align: right; }
+td { padding: 12px 8px; border-top: 1px solid var(--line); color: var(--soft); }
+tbody tr { cursor: pointer; }
+tbody tr:hover td { background: var(--row-hover); }
+tbody tr.sel td { background: var(--row-sel); }
+tbody tr.open td { background: var(--row-open); }
+input[type="checkbox"] { width: 16px; height: 16px; accent-color: var(--accent); cursor: pointer; }
+.who-cell { display: flex; align-items: center; gap: 12px; }
+.who-cell strong { display: block; font-family: var(--font-display); font-weight: 800; color: var(--fg); }
+.who-cell .rank { display: block; font-family: var(--font-mono); font-size: 11px; color: var(--accent); }
+.pill { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; padding: 3px 10px; border-radius: 999px; background: var(--ok-bg); color: var(--ok); white-space: nowrap; }
+.pill.loa { background: var(--loa-bg); color: var(--loa); }
+.row-btn { width: 34px; height: 34px; border-radius: 8px; background: transparent; border: 1px solid var(--line-strong); color: var(--soft); cursor: pointer; }
+.row-btn:hover { border-color: var(--muted); color: var(--fg); }
+.table-foot { display: flex; flex-wrap: wrap; gap: 8px; justify-content: space-between; align-items: center; padding: 12px 16px; border-top: 1px solid var(--line); color: var(--muted); font-size: 13px; }
+.empty { padding: 48px 24px; text-align: center; color: var(--muted); border-top: 1px solid var(--line); }
+.empty strong { display: block; color: var(--fg); font-family: var(--font-display); font-weight: 800; font-size: 18px; margin-bottom: 4px; }
+
+/* Audit log view */
+.log-list { list-style: none; margin: 0; padding: 0; }
+.log-list li { display: grid; grid-template-columns: 160px minmax(0, 1fr); gap: 16px; padding: 14px 16px; border-top: 1px solid var(--line); }
+.log-list li:first-child { border-top: 0; }
+.log-list time { font-family: var(--font-mono); font-size: 12px; color: var(--muted); }
+.log-list small { display: block; color: var(--muted); font-size: 13px; }
+
+/* ---------- Edit panel ---------- */
+.drawer { flex: 1 1 340px; max-width: 100%; background: var(--panel); border-left: 1px solid var(--line); padding: 24px; display: flex; flex-direction: column; gap: 16px; }
+.drawer-top { display: flex; align-items: center; justify-content: space-between; }
+.icon-btn { width: 34px; height: 34px; border-radius: 999px; background: transparent; border: 1px solid var(--line-strong); color: var(--fg); display: grid; place-items: center; cursor: pointer; }
+.drawer-id { display: flex; align-items: center; gap: 14px; }
+.drawer-id .avatar { width: 56px; height: 56px; font-size: 18px; }
+.drawer-id strong { display: block; font-family: var(--font-display); font-weight: 800; font-size: 22px; letter-spacing: -0.02em; line-height: 1.2; }
+.drawer-id small { display: block; color: var(--muted); font-size: 14px; }
+.grid2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.seg { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); padding: 4px; border-radius: 999px; background: var(--field); border: 1px solid var(--line-strong); }
+.seg button { min-height: 36px; border-radius: 999px; border: 0; background: transparent; color: var(--muted); font-size: 14px; cursor: pointer; }
+.seg button[aria-pressed="true"] { background: var(--chip); color: var(--fg); font-family: var(--font-display); font-weight: 800; }
+.history { padding: 14px; border-radius: 10px; background: var(--field); border: 1px solid var(--line); }
+.history ul { list-style: none; margin: 8px 0 0; padding: 0; font-size: 13px; color: var(--soft); display: flex; flex-direction: column; gap: 6px; }
+.history small { color: var(--muted); }
+.form-err { padding: 10px 12px; border-radius: 10px; border: 1px solid var(--danger); color: var(--danger); font-size: 14px; }
+.drawer-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: auto; padding-top: 8px; }
+.drawer-actions .btn-accent { flex: 1; min-height: 46px; }
+.drawer-actions .btn-danger { min-height: 46px; }
+.remove-confirm { padding: 14px; border-radius: 10px; border: 1px solid rgba(255,138,122,0.5); background: rgba(255,138,122,0.06); display: flex; flex-direction: column; gap: 10px; }
+.remove-confirm p { color: var(--fg); font-size: 14px; }
+
+.toast { position: fixed; left: 50%; bottom: calc(env(safe-area-inset-bottom, 0px) + 24px); transform: translateX(-50%); z-index: 40; padding: 12px 18px; border-radius: 999px; background: var(--fg); color: var(--ink); font-size: 14px; box-shadow: 0 10px 30px rgba(0,0,0,0.4); max-width: calc(100% - 32px); }
+
+/* ---------- Responsive ---------- */
+@media (max-width: 900px) {
+  .side { flex-basis: 100%; flex-direction: row; flex-wrap: wrap; align-items: center; gap: 12px; padding: 12px 16px; border-right: 0; border-bottom: 1px solid var(--line); }
+  .side nav { flex-direction: row; flex: 1 1 100%; min-width: 0; order: 3; overflow-x: auto; gap: 4px; scrollbar-width: none; }
+  .side .group { display: none; }
+  .nav-item { width: auto; flex: none; }
+  .nav-item .soon { display: none; }
+  .me { margin: 0 0 0 auto; flex-direction: row; align-items: center; padding: 6px 10px; }
+  .side .back-site { min-height: 40px; padding: 0 14px; }
+  .me .links { flex-wrap: nowrap; }
+  .content { padding: 20px 16px 40px; }
+  .drawer { position: fixed; inset: auto 0 0 0; z-index: 30; max-height: 88vh; overflow-y: auto; border-left: 0; border-top: 1px solid var(--line-strong); border-radius: 16px 16px 0 0; box-shadow: 0 -20px 50px rgba(0,0,0,0.5); }
+}
+@media (max-width: 600px) {
+  .roles { grid-template-columns: minmax(0, 1fr); }
+  .gate-card { padding: 22px; }
+  .log-list li { grid-template-columns: minmax(0, 1fr); gap: 2px; }
+  .me .who-text { display: none; }
+}
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+</head>
+<body>
+
+<!-- ================= Sign in ================= -->
+<div class="gate" id="signin" hidden>
+  <form class="gate-card" id="signin-form" novalidate aria-labelledby="signin-title">
+    <a href="./"><img src="unkso-logo.png" alt="UNKSO home" width="144" height="36"></a>
+    <h1 id="signin-title"><strong>UNKSO</strong> Console.</h1>
+    <p>Sign in to manage company members. This is a demo, so pick any role to try it.</p>
+    <div class="field">
+      <label for="si-name">Callsign</label>
+      <input class="input" type="text" id="si-name" autocomplete="username" placeholder="e.g. Civoen">
+      <span class="err" id="si-name-err" hidden></span>
+    </div>
+    <fieldset style="border: 0; padding: 0; margin: 0;">
+      <legend class="field" style="padding: 0; margin-bottom: 8px;"><span class="label" style="font-family: var(--font-display); font-weight: 800; font-size: 13px;">Role</span></legend>
+      <div class="roles">
+        <label class="role-opt"><input type="radio" name="role" value="Member"><strong>Member</strong><span>Can view rosters only.</span></label>
+        <label class="role-opt"><input type="radio" name="role" value="Moderator" checked><strong>Moderator</strong><span>Add, edit, move and remove members.</span></label>
+        <label class="role-opt"><input type="radio" name="role" value="Admin"><strong>Admin</strong><span>Everything Moderators can, plus reset the demo.</span></label>
+      </div>
+    </fieldset>
+    <button class="btn btn-accent" type="submit" style="min-height: 48px;">Sign in</button>
+    <p style="font-size: 13px;">Demo mode: no passwords, and changes are saved in this browser only.</p>
+    <a class="back-site" href="./"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6"/></svg>Back to Site</a>
+  </form>
+</div>
+
+<!-- ================= No access ================= -->
+<div class="gate" id="no-access" hidden>
+  <div class="gate-card">
+    <a href="./"><img src="unkso-logo.png" alt="UNKSO home" width="144" height="36"></a>
+    <h1>You don’t have <strong>access.</strong></h1>
+    <p>Only Moderators and Admins can manage company members. You can still view every roster on the company pages.</p>
+    <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+      <a class="btn btn-ghost" href="company-mw4.html">Bravo Company</a>
+      <a class="btn btn-ghost" href="company-bf6.html">Charlie Company</a>
+      <a class="btn btn-ghost" href="company-eft.html">Delta Company</a>
+      <button class="btn btn-ghost" type="button" data-signout>Sign out</button>
+    </div>
+    <a class="back-site" href="./"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6"/></svg>Back to Site</a>
+  </div>
+</div>
+
+<!-- ================= Console ================= -->
+<div class="app" id="app" hidden>
+  <aside class="side" aria-label="Console">
+    <a class="logo" href="./" aria-label="UNKSO home"><img src="unkso-logo.png" alt="UNKSO" width="136" height="34"></a>
+    <a class="back-site" href="./"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6"/></svg>Back to Site</a>
+    <nav aria-label="Console sections">
+      <span class="group">Manage</span>
+      <button class="nav-item" type="button" aria-disabled="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>Overview<span class="soon">Soon</span></button>
+      <button class="nav-item" type="button" data-view="members"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" aria-hidden="true"><circle cx="9" cy="8" r="3.5"/><path d="M2 20c.8-3.4 3.6-5.5 7-5.5s6.2 2.1 7 5.5M16 4.5a3.5 3.5 0 0 1 0 7M18.5 14.8c1.8.8 3 2.6 3.5 5.2"/></svg>Members<span class="count" id="nav-count">0</span></button>
+      <button class="nav-item" type="button" aria-disabled="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" aria-hidden="true"><path d="M7 4h10a2 2 0 0 1 2 2v13a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2ZM9 10h6M9 14h6"/></svg>Applications<span class="soon">Soon</span></button>
+      <button class="nav-item" type="button" aria-disabled="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" aria-hidden="true"><path d="m6 14 6-5 6 5M6 19l6-5 6 5"/></svg>Promotions<span class="soon">Soon</span></button>
+      <button class="nav-item" type="button" aria-disabled="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" aria-hidden="true"><path d="M8 3h8l-2 6h-4ZM12 9a6 6 0 1 1 0 12a6 6 0 0 1 0-12Z"/></svg>Awards<span class="soon">Soon</span></button>
+      <button class="nav-item" type="button" aria-disabled="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" aria-hidden="true"><path d="M2 16 22 8l-4 10-5-3-3 4v-5l8-6"/></svg>Leave requests<span class="soon">Soon</span></button>
+      <span class="group">System</span>
+      <button class="nav-item" type="button" data-view="log"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7L3 8M3 3v5h5M12 7v5l4 2"/></svg>Audit log</button>
+    </nav>
+    <div class="me">
+      <div class="me-row">
+        <span class="avatar" id="me-ini"></span>
+        <span class="who-text"><strong id="me-name"></strong><small id="me-role"></small></span>
+      </div>
+      <div class="links">
+        <button class="btn btn-ghost btn-sm" type="button" data-signout>Sign out</button>
+        <button class="btn btn-danger btn-sm" type="button" id="reset" hidden>Reset demo</button>
+      </div>
+      <div id="reset-confirm" hidden>
+        <p style="font-size: 13px; color: var(--soft); margin-bottom: 8px;">Reset every company to the starting roster?</p>
+        <button class="btn btn-danger-solid btn-sm" type="button" id="reset-yes">Reset</button>
+        <button class="btn btn-ghost btn-sm" type="button" id="reset-no">Cancel</button>
+      </div>
+    </div>
+  </aside>
+
+  <main class="main">
+    <!-- Members view -->
+    <section class="content" id="view-members" aria-labelledby="members-title">
+      <div class="page-head">
+        <div class="title">
+          <div class="crumb" id="crumb">Members</div>
+          <h1 id="members-title">Members</h1>
+        </div>
+        <label class="search">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg>
+          <span class="sr">Search members</span>
+          <input type="search" id="q" placeholder="Search callsign, rank…" autocomplete="off">
+        </label>
+        <button class="btn btn-accent" type="button" id="add-btn">+ Add member</button>
+      </div>
+
+      <div class="demo" role="note">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></svg>
+        <span><strong>Demo mode.</strong> Changes are saved in this browser only, so other people won’t see them.</span>
+      </div>
+
+      <div class="toolbar">
+        <div role="tablist" aria-label="Companies" id="tabs" style="display: flex; flex-wrap: wrap; gap: 8px;"></div>
+        <span class="spacer"></span>
+        <label class="status-filter">Status
+          <select class="input" id="status-filter">
+            <option value="">All</option>
+            <option value="Active">Active</option>
+            <option value="Leave of Absence">Leave of Absence</option>
+          </select>
+        </label>
+      </div>
+
+      <div class="table-card" role="tabpanel" id="panel">
+        <div class="bulk" id="bulk" hidden></div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th scope="col"><input type="checkbox" id="select-all" aria-label="Select all"></th>
+                <th scope="col">Member</th>
+                <th scope="col">Position</th>
+                <th scope="col">Unit</th>
+                <th scope="col">Status</th>
+                <th scope="col">Joined</th>
+                <th scope="col"><span class="sr">Actions</span></th>
+              </tr>
+            </thead>
+            <tbody id="rows"></tbody>
+          </table>
+        </div>
+        <div class="empty" id="empty" hidden></div>
+        <div class="table-foot"><span id="foot-summary"></span><a id="foot-page" href="#" style="color: var(--soft);">View company page →</a></div>
+      </div>
+    </section>
+
+    <!-- Audit log view -->
+    <section class="content" id="view-log" aria-labelledby="log-title" hidden>
+      <div class="page-head">
+        <div class="title">
+          <div class="crumb">System</div>
+          <h1 id="log-title">Audit log</h1>
+        </div>
+      </div>
+      <div class="table-card">
+        <ul class="log-list" id="log-list"></ul>
+      </div>
+    </section>
+
+    <!-- Edit / add panel -->
+    <aside class="drawer" id="drawer" aria-labelledby="drawer-title" hidden>
+      <form id="member-form" novalidate style="display: contents;">
+        <div class="drawer-top">
+          <span class="mono" style="color: var(--muted);" id="drawer-kicker">Edit member</span>
+          <button class="icon-btn" type="button" id="drawer-close" aria-label="Close">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>
+          </button>
+        </div>
+        <div class="drawer-id">
+          <span class="avatar" id="d-ini"></span>
+          <span><strong id="drawer-title"></strong><small id="d-sub"></small></span>
+        </div>
+        <div class="form-err" id="form-err" hidden></div>
+        <div class="field">
+          <label for="f-callsign">Callsign</label>
+          <input class="input" type="text" id="f-callsign" autocomplete="off" spellcheck="false" placeholder="e.g. MidKng">
+          <span class="err" id="f-callsign-err" hidden></span>
+        </div>
+        <div class="grid2">
+          <div class="field"><label for="f-rank">Rank</label><select class="input" id="f-rank"></select><span class="err" id="f-rank-err" hidden></span></div>
+          <div class="field"><label for="f-company">Company</label><select class="input" id="f-company"></select><span class="err" id="f-company-err" hidden></span></div>
+          <div class="field" style="grid-column: 1 / -1;"><label for="f-position">Position</label><select class="input" id="f-position"></select><span class="err" id="f-position-err" hidden></span></div>
+          <div class="field"><label for="f-unit">Unit</label><select class="input" id="f-unit"></select><span class="err" id="f-unit-err" hidden></span></div>
+        </div>
+        <div class="field">
+          <span class="label" id="status-label">Status</span>
+          <div class="seg" role="group" aria-labelledby="status-label">
+            <button type="button" data-status="Active" aria-pressed="true">Active</button>
+            <button type="button" data-status="Leave of Absence" aria-pressed="false">On leave</button>
+          </div>
+        </div>
+        <div class="field">
+          <label for="f-joined">Joined <span class="opt">Optional</span></label>
+          <input class="input" type="date" id="f-joined">
+        </div>
+        <div class="history" id="history" hidden>
+          <span class="mono" style="color: var(--muted);">History</span>
+          <ul id="history-list"></ul>
+        </div>
+        <div class="remove-confirm" id="remove-confirm" hidden>
+          <p id="remove-text"></p>
+          <div style="display: flex; gap: 8px;">
+            <button class="btn btn-danger-solid btn-sm" type="button" id="remove-yes">Remove</button>
+            <button class="btn btn-ghost btn-sm" type="button" id="remove-no">Cancel</button>
+          </div>
+        </div>
+        <div class="drawer-actions">
+          <button class="btn btn-accent" type="submit" id="save-btn">Save changes</button>
+          <button class="btn btn-danger" type="button" id="remove-btn">Remove</button>
+        </div>
+      </form>
+    </aside>
+  </main>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+
+<script src="js/store.js"></script>
+<script>
+(function () {
+  var U = window.UNKSO;
+  var $ = function (id) { return document.getElementById(id); };
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+  function initials(name) {
+    var caps = (name || '').replace(/[^A-Z]/g, '');
+    if (caps.length >= 2) return caps.slice(0, 2);
+    return (name || '?').replace(/[^A-Za-z0-9]/g, '').slice(0, 2).toUpperCase();
+  }
+  function fmtJoined(d) { if (!d) return '—'; var dt = new Date(d + 'T00:00:00'); return isNaN(dt) ? '—' : dt.toLocaleDateString(undefined, { month: 'short', year: 'numeric' }); }
+  function fmtTime(iso) { return new Date(iso).toLocaleString(undefined, { day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit' }); }
+
+  // ---------- State ----------
+  var state = {
+    view: 'members',
+    company: U.company((location.hash || '').slice(1)) ? location.hash.slice(1) : 'bravo',
+    q: '', status: '',
+    selected: {},          // id -> true
+    openId: null,          // member in the drawer, or 'new'
+    bulkMode: null,        // null | 'move' | 'unit' | 'remove'
+    removing: false,
+    draftStatus: 'Active'
+  };
+
+  var toastTimer;
+  function toast(msg) { var t = $('toast'); t.textContent = msg; t.hidden = false; clearTimeout(toastTimer); toastTimer = setTimeout(function () { t.hidden = true; }, 2800); }
+
+  // ---------- Gate ----------
+  function render() {
+    var s = U.session();
+    $('signin').hidden = !!s;
+    $('no-access').hidden = !(s && !U.canManage(s));
+    $('app').hidden = !(s && U.canManage(s));
+    if (!s || !U.canManage(s)) return;
+
+    $('me-ini').textContent = initials(s.name);
+    $('me-name').textContent = s.name;
+    $('me-role').textContent = s.role;
+    $('reset').hidden = s.role !== 'Admin' || !$('reset-confirm').hidden;
+    $('nav-count').textContent = U.list().length;
+    document.querySelectorAll('[data-view]').forEach(function (b) {
+      if (b.getAttribute('data-view') === state.view) b.setAttribute('aria-current', 'page'); else b.removeAttribute('aria-current');
+    });
+    $('view-members').hidden = state.view !== 'members';
+    $('view-log').hidden = state.view !== 'log';
+    if (state.view === 'members') renderMembers(); else renderLog();
+    renderDrawer();
+  }
+
+  // ---------- Members ----------
+  function visibleMembers() {
+    var q = state.q.trim().toLowerCase();
+    return U.list(state.company).filter(function (m) {
+      if (state.status && m.status !== state.status) return false;
+      return !q || (m.callsign + ' ' + m.rank + ' ' + m.position + ' ' + m.unit).toLowerCase().indexOf(q) !== -1;
+    });
+  }
+  function renderMembers() {
+    var c = U.company(state.company);
+    $('crumb').textContent = 'Members / ' + c.name + ' Company';
+    $('tabs').innerHTML = U.COMPANIES.map(function (co) {
+      var sel = co.id === state.company;
+      return '<button class="tab" role="tab" type="button" id="tab-' + co.id + '" aria-selected="' + sel + '" aria-controls="panel" tabindex="' + (sel ? 0 : -1) + '" data-company="' + co.id + '">' +
+        '<strong>' + esc(co.name) + '</strong><span class="game">' + esc(co.short) + '</span><span class="n">' + U.list(co.id).length + '</span></button>';
+    }).join('');
+    $('panel').setAttribute('aria-labelledby', 'tab-' + state.company);
+
+    var all = U.list(state.company);
+    var rows = visibleMembers();
+    // Drop selections that are no longer visible
+    Object.keys(state.selected).forEach(function (id) { if (!rows.some(function (m) { return m.id === id; })) delete state.selected[id]; });
+    var selCount = Object.keys(state.selected).length;
+
+    $('rows').innerHTML = rows.map(function (m) {
+      var sel = !!state.selected[m.id];
+      var cls = (state.openId === m.id ? 'open' : (sel ? 'sel' : ''));
+      var leave = m.status !== 'Active';
+      return '<tr class="' + cls + '" data-id="' + m.id + '">' +
+        '<td><input type="checkbox" data-check="' + m.id + '"' + (sel ? ' checked' : '') + ' aria-label="Select ' + esc(U.displayName(m)) + '"></td>' +
+        '<td><span class="who-cell"><span class="avatar">' + esc(initials(m.callsign)) + '</span><span><strong>' + esc(U.displayName(m)) + '</strong><span class="rank">' + esc(m.rank) + '</span></span></span></td>' +
+        '<td>' + esc(m.position) + '</td>' +
+        '<td>' + esc(m.unit) + '</td>' +
+        '<td><span class="pill' + (leave ? ' loa' : '') + '">' + (leave ? 'On leave' : 'Active') + '</span></td>' +
+        '<td style="color: var(--muted);">' + esc(fmtJoined(m.joined)) + '</td>' +
+        '<td><button class="row-btn" type="button" data-open="' + m.id + '" aria-label="Edit ' + esc(U.displayName(m)) + '">' +
+        '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16Z"/></svg></button></td>' +
+        '</tr>';
+    }).join('');
+
+    var sa = $('select-all');
+    sa.checked = rows.length > 0 && selCount === rows.length;
+    sa.indeterminate = selCount > 0 && selCount < rows.length;
+    sa.disabled = !rows.length;
+
+    var empty = $('empty');
+    if (!all.length) { empty.hidden = false; empty.innerHTML = '<strong>No members in ' + esc(c.name) + ' Company yet</strong>Use Add member to build the roster and Chain of Command.'; }
+    else if (!rows.length) { empty.hidden = false; empty.innerHTML = '<strong>No members match</strong>Try another search or status.'; }
+    else empty.hidden = true;
+
+    var active = all.filter(function (m) { return m.status === 'Active'; }).length;
+    $('foot-summary').textContent = all.length + (all.length === 1 ? ' member' : ' members') + ' · ' + active + ' active · ' + (all.length - active) + ' on leave';
+    $('foot-page').href = c.page;
+    $('foot-page').textContent = 'View ' + c.name + ' Company page →';
+
+    renderBulk(selCount);
+  }
+
+  function renderBulk(n) {
+    var bulk = $('bulk');
+    if (!n) { bulk.hidden = true; state.bulkMode = null; return; }
+    bulk.hidden = false;
+    var label = '<strong>' + n + ' selected</strong>';
+    if (state.bulkMode === 'move') {
+      bulk.innerHTML = label + '<label class="sr" for="bulk-company">Move to company</label><select class="input" id="bulk-company">' +
+        U.COMPANIES.filter(function (c) { return c.id !== state.company; }).map(function (c) { return '<option value="' + c.id + '">' + esc(c.name) + ' Company</option>'; }).join('') +
+        '</select><button class="btn btn-accent btn-sm" type="button" data-bulk-apply="move">Move</button><button class="btn btn-ghost btn-sm" type="button" data-bulk="cancel">Cancel</button>';
+    } else if (state.bulkMode === 'unit') {
+      bulk.innerHTML = label + '<label class="sr" for="bulk-unit">Change unit</label><select class="input" id="bulk-unit">' +
+        U.UNITS.map(function (u) { return '<option>' + esc(u) + '</option>'; }).join('') +
+        '</select><button class="btn btn-accent btn-sm" type="button" data-bulk-apply="unit">Apply</button><button class="btn btn-ghost btn-sm" type="button" data-bulk="cancel">Cancel</button>';
+    } else if (state.bulkMode === 'remove') {
+      bulk.innerHTML = label + '<span class="confirm">Remove ' + (n === 1 ? 'this member' : 'these ' + n + ' members') + ' from the clan roster?</span><button class="btn btn-danger-solid btn-sm" type="button" data-bulk-apply="remove">Remove</button><button class="btn btn-ghost btn-sm" type="button" data-bulk="cancel">Cancel</button>';
+    } else {
+      bulk.innerHTML = label + '<button class="btn btn-ghost btn-sm" type="button" data-bulk="move">Move to company</button><button class="btn btn-ghost btn-sm" type="button" data-bulk="unit">Change unit</button><button class="btn btn-danger btn-sm" type="button" data-bulk="remove">Remove</button><button class="btn btn-ghost btn-sm" type="button" data-bulk="clear" style="margin-left: auto;">Clear selection</button>';
+    }
+  }
+
+  function applyBulk(kind) {
+    var ids = Object.keys(state.selected);
+    var ok = 0, failed = [];
+    ids.forEach(function (id) {
+      var m = U.get(id); if (!m) return;
+      var res;
+      try {
+        if (kind === 'move') res = U.update(id, { company: $('bulk-company').value, position: ['Company Commander', 'Executive Officer', 'First Sergeant'].indexOf(m.position) !== -1 ? 'Member' : m.position });
+        else if (kind === 'unit') res = U.update(id, { unit: $('bulk-unit').value });
+        else res = U.remove(id);
+      } catch (e) { res = { ok: false }; }
+      if (res && res.ok) ok++; else failed.push(U.displayName(m));
+    });
+    var verb = kind === 'move' ? 'Moved ' : kind === 'unit' ? 'Updated ' : 'Removed ';
+    state.selected = {}; state.bulkMode = null;
+    if (state.openId && !U.get(state.openId)) state.openId = null;
+    render();
+    toast(verb + ok + (ok === 1 ? ' member' : ' members') + (failed.length ? '. Couldn’t change ' + failed.join(', ') + '.' : '.'));
+  }
+
+  // ---------- Audit log ----------
+  function renderLog() {
+    var log = U.log();
+    $('log-list').innerHTML = log.length ? log.map(function (l) {
+      return '<li><time datetime="' + esc(l.at) + '">' + esc(fmtTime(l.at)) + '</time><span>' + esc(l.text) + '<small>' + esc(l.by) + '</small></span></li>';
+    }).join('') : '<li><span></span><span style="color: var(--muted);">No changes yet.</span></li>';
+  }
+
+  // ---------- Drawer ----------
+  function fill(id, items, labelFn) {
+    $(id).innerHTML = items.map(function (v) { var val = typeof v === 'object' ? v.id : v; return '<option value="' + esc(val) + '">' + esc(labelFn ? labelFn(v) : v) + '</option>'; }).join('');
+  }
+  fill('f-rank', U.RANKS); fill('f-position', U.POSITIONS); fill('f-unit', U.UNITS);
+  fill('f-company', U.COMPANIES, function (c) { return c.name + ' (' + c.short + ')'; });
+
+  var FIELDS = ['callsign', 'rank', 'company', 'position', 'unit'];
+  function clearErrors() {
+    FIELDS.forEach(function (f) { $('f-' + f + '-err').hidden = true; $('f-' + f).removeAttribute('aria-invalid'); });
+    $('form-err').hidden = true;
+  }
+  function setStatus(v) {
+    state.draftStatus = v;
+    document.querySelectorAll('[data-status]').forEach(function (b) { b.setAttribute('aria-pressed', String(b.getAttribute('data-status') === v)); });
+  }
+  var lastFocus = null;
+  function openDrawer(id) {
+    lastFocus = document.activeElement;
+    state.openId = id; state.removing = false;
+    clearErrors();
+    var m = id === 'new' ? null : U.get(id);
+    $('f-callsign').value = m ? m.callsign : '';
+    $('f-rank').value = m ? m.rank : 'RCT';
+    $('f-company').value = m ? m.company : state.company;
+    $('f-position').value = m ? m.position : 'Member';
+    $('f-unit').value = m ? m.unit : '1st Squad';
+    $('f-joined').value = m ? (m.joined || '') : new Date().toISOString().slice(0, 10);
+    setStatus(m ? m.status : 'Active');
+    render();
+    $('f-callsign').focus();
+  }
+  function closeDrawer() {
+    state.openId = null; state.removing = false;
+    render();
+    if (lastFocus && document.body.contains(lastFocus)) lastFocus.focus();
+  }
+  function renderDrawer() {
+    var d = $('drawer');
+    if (!state.openId || state.view !== 'members') { d.hidden = true; return; }
+    d.hidden = false;
+    var isNew = state.openId === 'new';
+    var m = isNew ? null : U.get(state.openId);
+    if (!isNew && !m) { state.openId = null; d.hidden = true; return; }
+    var co = U.company(isNew ? state.company : m.company);
+    $('drawer-kicker').textContent = isNew ? 'Add member' : 'Edit member';
+    $('drawer-title').textContent = isNew ? 'New member' : U.displayName(m);
+    $('d-sub').textContent = isNew ? co.name + ' Company' : co.name + ' Company · ' + m.position;
+    $('d-ini').textContent = isNew ? '+' : initials(m.callsign);
+    $('save-btn').textContent = isNew ? 'Add member' : 'Save changes';
+    $('remove-btn').hidden = isNew || state.removing;
+    $('remove-confirm').hidden = isNew || !state.removing;
+    if (!isNew) $('remove-text').textContent = 'Remove ' + U.displayName(m) + ' from ' + co.name + ' Company? This can’t be undone.';
+    // History: log entries that mention this member's callsign
+    var h = $('history');
+    if (isNew) { h.hidden = true; return; }
+    var re = new RegExp('\\.' + m.callsign.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\b', 'i');
+    var items = U.log().filter(function (l) { return re.test(l.text); }).slice(0, 6);
+    h.hidden = false;
+    $('history-list').innerHTML = items.length
+      ? items.map(function (l) { return '<li>' + esc(l.text) + ' <small>· ' + esc(fmtTime(l.at)) + '</small></li>'; }).join('')
+      : '<li><small>No changes recorded yet.</small></li>';
+  }
+
+  $('member-form').addEventListener('submit', function (e) {
+    e.preventDefault();
+    clearErrors();
+    var data = { callsign: $('f-callsign').value, rank: $('f-rank').value, company: $('f-company').value, position: $('f-position').value, unit: $('f-unit').value, status: state.draftStatus, joined: $('f-joined').value };
+    var isNew = state.openId === 'new';
+    var res;
+    try { res = isNew ? U.add(data) : U.update(state.openId, data); }
+    catch (err) { $('form-err').textContent = err.message; $('form-err').hidden = false; return; }
+    if (!res.ok) {
+      var first = null;
+      Object.keys(res.errors).forEach(function (k) {
+        if (k === 'form' || k === 'status') { $('form-err').textContent = res.errors[k]; $('form-err').hidden = false; return; }
+        var el = $('f-' + k + '-err'); if (!el) return;
+        el.textContent = res.errors[k]; el.hidden = false; $('f-' + k).setAttribute('aria-invalid', 'true');
+        if (!first) first = $('f-' + k);
+      });
+      if (first) first.focus();
+      return;
+    }
+    if (res.member.company !== state.company) { state.company = res.member.company; history.replaceState(null, '', '#' + state.company); }
+    state.openId = res.member.id;
+    render();
+    toast((isNew ? 'Added ' : 'Saved ') + U.displayName(res.member) + '.');
+  });
+  $('drawer-close').addEventListener('click', closeDrawer);
+  document.querySelectorAll('[data-status]').forEach(function (b) { b.addEventListener('click', function () { setStatus(b.getAttribute('data-status')); }); });
+  $('remove-btn').addEventListener('click', function () { state.removing = true; renderDrawer(); $('remove-yes').focus(); });
+  $('remove-no').addEventListener('click', function () { state.removing = false; renderDrawer(); $('remove-btn').focus(); });
+  $('remove-yes').addEventListener('click', function () {
+    try {
+      var r = U.remove(state.openId);
+      delete state.selected[state.openId];
+      state.openId = null; state.removing = false;
+      render();
+      if (r.ok) toast('Removed ' + U.displayName(r.member) + '.');
+    } catch (err) { toast(err.message); }
+  });
+
+  // ---------- Events ----------
+  $('add-btn').addEventListener('click', function () { openDrawer('new'); });
+  $('q').addEventListener('input', function () { state.q = this.value; render(); });
+  $('status-filter').addEventListener('change', function () { state.status = this.value; render(); });
+
+  $('tabs').addEventListener('click', function (e) {
+    var t = e.target.closest('[data-company]'); if (!t) return;
+    switchCompany(t.getAttribute('data-company'));
+  });
+  $('tabs').addEventListener('keydown', function (e) {
+    if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return;
+    var ids = U.COMPANIES.map(function (c) { return c.id; });
+    var i = ids.indexOf(state.company) + (e.key === 'ArrowRight' ? 1 : -1);
+    switchCompany(ids[(i + ids.length) % ids.length]);
+  });
+  function switchCompany(id) {
+    state.company = id; state.selected = {}; state.bulkMode = null;
+    if (state.openId && state.openId !== 'new') state.openId = null;
+    history.replaceState(null, '', '#' + id);
+    render();
+    $('tab-' + id).focus();
+  }
+
+  $('rows').addEventListener('click', function (e) {
+    var chk = e.target.closest('[data-check]');
+    if (chk) {
+      var id = chk.getAttribute('data-check');
+      if (chk.checked) state.selected[id] = true; else delete state.selected[id];
+      state.bulkMode = null;
+      render();
+      return;
+    }
+    var btn = e.target.closest('[data-open]');
+    var row = e.target.closest('tr[data-id]');
+    if (btn) { openDrawer(btn.getAttribute('data-open')); return; }
+    if (row) openDrawer(row.getAttribute('data-id'));
+  });
+  $('select-all').addEventListener('change', function () {
+    var rows = visibleMembers();
+    state.selected = {};
+    if (this.checked) rows.forEach(function (m) { state.selected[m.id] = true; });
+    state.bulkMode = null;
+    render();
+  });
+  $('bulk').addEventListener('click', function (e) {
+    var b = e.target.closest('[data-bulk]');
+    if (b) {
+      var k = b.getAttribute('data-bulk');
+      if (k === 'clear') { state.selected = {}; state.bulkMode = null; }
+      else if (k === 'cancel') state.bulkMode = null;
+      else state.bulkMode = k;
+      render();
+      var focusEl = $('bulk').querySelector('select, [data-bulk-apply]'); if (focusEl) focusEl.focus();
+      return;
+    }
+    var a = e.target.closest('[data-bulk-apply]');
+    if (a) applyBulk(a.getAttribute('data-bulk-apply'));
+  });
+
+  document.querySelectorAll('[data-view]').forEach(function (b) {
+    b.addEventListener('click', function () { state.view = b.getAttribute('data-view'); render(); });
+  });
+  document.querySelectorAll('.nav-item[aria-disabled="true"]').forEach(function (b) {
+    b.addEventListener('click', function () { toast(b.textContent.replace('Soon', '').trim() + ' is coming in a later version.'); });
+  });
+
+  // Sign in / out
+  $('signin-form').addEventListener('submit', function (e) {
+    e.preventDefault();
+    var name = $('si-name').value.trim();
+    if (!name) { $('si-name-err').textContent = 'Enter your callsign.'; $('si-name-err').hidden = false; $('si-name').setAttribute('aria-invalid', 'true'); $('si-name').focus(); return; }
+    $('si-name-err').hidden = true; $('si-name').removeAttribute('aria-invalid');
+    var role = (document.querySelector('input[name="role"]:checked') || {}).value || 'Member';
+    U.signIn(name, role);
+    render();
+    toast('Signed in as ' + name + ' (' + role + ').');
+  });
+  document.querySelectorAll('[data-signout]').forEach(function (b) {
+    b.addEventListener('click', function () { U.signOut(); state.openId = null; state.selected = {}; render(); toast('Signed out.'); });
+  });
+
+  // Reset (Admin)
+  $('reset').addEventListener('click', function () { $('reset-confirm').hidden = false; $('reset').hidden = true; $('reset-yes').focus(); });
+  $('reset-no').addEventListener('click', function () { $('reset-confirm').hidden = true; render(); $('reset').focus(); });
+  $('reset-yes').addEventListener('click', function () {
+    try { U.reset(); $('reset-confirm').hidden = true; state.selected = {}; state.openId = null; render(); toast('Demo data reset.'); }
+    catch (err) { toast(err.message); }
+  });
+
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && state.openId) closeDrawer(); });
+  U.onChange(render);
+  render();
+})();
+</script>
+</body>
+</html>

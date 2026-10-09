@@ -1,0 +1,641 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>UNKSO Application</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;800&family=Geist+Mono:wght@400;500&display=swap">
+<style>
+@font-face { font-family: "UNKSO Gilroy"; font-weight: 300; src: local("Gilroy-Light"), local("Gilroy Light"); }
+@font-face { font-family: "UNKSO Gilroy"; font-weight: 800; src: local("Gilroy-ExtraBold"), local("Gilroy ExtraBold"); }
+/* Layout: short cinematic band, then a sticky progress rail beside a four-part form. */
+:root {
+  --ink: #07090D;
+  --ink-raised: #0E121A;
+  --field: #0B0E14;
+  --line: #1E232D;
+  --line-strong: #2C3340;
+  --fg: #F3F4F6;
+  --soft: #C4C9D2;
+  --muted: #9AA2B1;
+  --accent: #F07A2E;
+  --on-accent: #07090D;
+  --error: #FF8A7A;
+  --ok: #7FD19B;
+  --placeholder-a: #11151D;
+  --placeholder-b: #151A24;
+  --font-display: "UNKSO Gilroy", "Plus Jakarta Sans", system-ui, sans-serif;
+  --font-text: "UNKSO Gilroy", "Plus Jakarta Sans", system-ui, sans-serif;
+  --font-mono: "Geist Mono", ui-monospace, Menlo, monospace;
+  --w-light: 300;
+  --w-heavy: 800;
+  --maxw: 1240px;
+  --gutter: clamp(16px, 4vw, 32px);
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+:root { padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); }
+body {
+  margin: 0; background: var(--ink); color: var(--fg);
+  font-family: var(--font-text); font-weight: var(--w-light);
+  font-size: 17px; line-height: 1.6; -webkit-font-smoothing: antialiased;
+}
+img { max-width: 100%; }
+[hidden] { display: none !important; }
+a { color: inherit; }
+h1, h2, h3 { font-family: var(--font-display); margin: 0; text-wrap: balance; }
+p { margin: 0; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+.wrap { max-width: var(--maxw); margin-inline: auto; padding-inline: var(--gutter); }
+.mono { font-family: var(--font-mono); font-size: 13px; letter-spacing: 0.06em; text-transform: uppercase; }
+
+/* Buttons */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 10px; min-height: 52px;
+  padding: 0 28px; border-radius: 999px; border: 0; cursor: pointer; text-decoration: none;
+  font-family: var(--font-display); font-weight: var(--w-heavy); font-size: 16px;
+  transition: transform .2s ease, background-color .2s ease;
+}
+.btn:hover { transform: translateY(-1px); }
+.btn-accent { background: var(--accent); color: var(--on-accent); }
+.btn-ghost { background: transparent; color: var(--fg); border: 1px solid var(--line-strong); }
+
+/* Hero band */
+.hero { position: relative; overflow: hidden; }
+.hero-media { position: absolute; inset: 0; background: repeating-linear-gradient(135deg, var(--placeholder-a) 0 18px, var(--placeholder-b) 18px 36px); }
+.hero-media span { position: absolute; top: 110px; right: var(--gutter); font-family: var(--font-mono); font-size: 12px; color: #7C8495; text-transform: uppercase; }
+.hero-shade { position: absolute; inset: 0; background: linear-gradient(to top, var(--ink) 0%, rgba(7,9,13,0.8) 45%, rgba(7,9,13,0.55) 100%); }
+.nav { position: relative; z-index: 2; display: flex; align-items: center; gap: 16px; padding-block: 24px; }
+.nav .logo img { display: block; height: 40px; width: auto; }
+.nav-right { margin-left: auto; display: flex; gap: 4px; align-items: center; }
+.nav-right a { display: inline-flex; align-items: center; min-height: 44px; padding: 0 14px; text-decoration: none; color: var(--soft); font-size: 15px; }
+.nav-right a:hover { color: var(--fg); }
+.hero-body { position: relative; z-index: 2; padding-block: clamp(56px, 9vw, 112px) clamp(48px, 6vw, 72px); }
+.signal { display: inline-flex; align-items: center; gap: 12px; margin-bottom: 20px; color: var(--accent); }
+.signal::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--accent); }
+.hero h1 { font-weight: var(--w-light); font-size: clamp(44px, 7vw, 92px); line-height: 0.98; letter-spacing: -0.04em; }
+.hero h1 strong { display: block; font-weight: var(--w-heavy); letter-spacing: -0.035em; color: var(--accent); }
+.hero p { margin-top: 24px; max-width: 58ch; color: var(--soft); }
+
+/* Layout */
+.layout { display: grid; grid-template-columns: 290px minmax(0, 1fr); gap: clamp(40px, 6vw, 88px); padding-block: 24px 120px; align-items: start; }
+.rail { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 24px); display: flex; flex-direction: column; gap: 32px; }
+.progress { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.progress a {
+  display: grid; grid-template-columns: 28px 1fr; gap: 14px; align-items: center;
+  padding: 14px 0; text-decoration: none; color: var(--muted); border-top: 1px solid var(--line);
+}
+.progress li:last-child a { border-bottom: 1px solid var(--line); }
+.progress .dot {
+  width: 28px; height: 28px; border-radius: 50%; border: 1px solid var(--line-strong);
+  display: grid; place-items: center; font-family: var(--font-mono); font-size: 12px; color: var(--muted);
+}
+.progress a[aria-current="step"] { color: var(--fg); }
+.progress a[aria-current="step"] .dot { border-color: var(--accent); color: var(--accent); }
+.progress a.done .dot { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+.progress a.done .dot .n { display: none; }
+.progress .tick { display: none; }
+.progress a.done .tick { display: block; }
+.progress .label { font-family: var(--font-display); font-weight: var(--w-heavy); font-size: 16px; }
+.rail-note { padding: 24px; border-radius: 8px; background: var(--ink-raised); border: 1px solid var(--line); display: flex; flex-direction: column; gap: 12px; }
+.rail-note h2 { font-weight: var(--w-heavy); font-size: 18px; }
+.rail-note ol { margin: 0; padding-left: 18px; color: var(--soft); font-size: 15px; display: flex; flex-direction: column; gap: 6px; }
+
+/* Form */
+form { display: flex; flex-direction: column; gap: 72px; }
+fieldset { border: 0; margin: 0; padding: 0; min-width: 0; display: flex; flex-direction: column; gap: 28px; scroll-margin-top: 24px; }
+legend { padding: 0; margin-bottom: 4px; width: 100%; }
+.section-head { display: flex; flex-direction: column; gap: 6px; padding-bottom: 20px; border-bottom: 1px solid var(--line); }
+.section-head .mono { color: var(--accent); }
+.section-head h2 { font-weight: var(--w-heavy); font-size: clamp(28px, 3vw, 36px); letter-spacing: -0.02em; line-height: 1.1; }
+.section-head p { color: var(--muted); font-size: 16px; }
+
+.row { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 28px; }
+.field { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.field > label, .field .q { font-family: var(--font-display); font-weight: var(--w-heavy); font-size: 16px; }
+.opt { font-family: var(--font-text); font-weight: var(--w-light); color: var(--muted); font-size: 14px; margin-left: 6px; }
+.hint { color: var(--muted); font-size: 14px; line-height: 1.5; }
+input[type="text"], input[type="email"], input[type="number"], select, textarea {
+  width: 100%; min-height: 52px; padding: 13px 16px; border-radius: 8px;
+  background: var(--field); color: var(--fg); border: 1px solid var(--line-strong);
+  font: inherit; font-weight: var(--w-light); font-size: 16px;
+  transition: border-color .15s ease, box-shadow .15s ease;
+}
+input::placeholder, textarea::placeholder { color: #6B7383; }
+input:hover, select:hover, textarea:hover { border-color: #3D4656; }
+input:focus, select:focus, textarea:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(240,122,46,0.22); }
+select {
+  appearance: none; -webkit-appearance: none; padding-right: 44px; cursor: pointer;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%239AA2B1' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 16px center;
+}
+textarea { min-height: 150px; resize: vertical; line-height: 1.55; }
+input[type="number"] { max-width: 180px; font-variant-numeric: tabular-nums; }
+.counter { display: flex; justify-content: space-between; gap: 12px; color: var(--muted); font-size: 14px; font-variant-numeric: tabular-nums; }
+.counter .ok { color: var(--ok); }
+.error { color: var(--error); font-size: 14px; display: flex; gap: 8px; align-items: flex-start; }
+.error::before { content: "!"; flex: none; width: 18px; height: 18px; border-radius: 50%; background: var(--error); color: var(--ink); font-weight: var(--w-heavy); font-size: 12px; display: grid; place-items: center; margin-top: 1px; }
+[aria-invalid="true"] { border-color: var(--error) !important; }
+
+/* Choice cards */
+.choices { display: grid; gap: 12px; }
+.choices.three { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.choices.two { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.choice { position: relative; display: flex; flex-direction: column; gap: 6px; padding: 18px 18px 18px 52px; border-radius: 8px; background: var(--field); border: 1px solid var(--line-strong); cursor: pointer; transition: border-color .15s ease, background-color .15s ease; }
+.choice:hover { border-color: #3D4656; }
+.choice input { position: absolute; left: 18px; top: 20px; width: 18px; height: 18px; margin: 0; accent-color: var(--accent); cursor: pointer; }
+.choice .t { font-family: var(--font-display); font-weight: var(--w-heavy); font-size: 16px; line-height: 1.3; }
+.choice .d { color: var(--muted); font-size: 14px; line-height: 1.45; }
+.choice:has(input:checked) { border-color: var(--accent); background: rgba(240,122,46,0.07); }
+.choice:has(input:focus-visible) { box-shadow: 0 0 0 3px rgba(240,122,46,0.3); }
+.company { padding: 0; overflow: hidden; }
+.company .img { height: 120px; background: repeating-linear-gradient(135deg, var(--placeholder-a) 0 14px, var(--placeholder-b) 14px 28px); position: relative; }
+.company .img span { position: absolute; left: 14px; bottom: 10px; font-family: var(--font-mono); font-size: 11px; color: #7C8495; text-transform: uppercase; }
+.company .body { padding: 16px 18px 18px 52px; display: flex; flex-direction: column; gap: 4px; }
+.company input { top: 138px; }
+.company .d.mono { font-size: 12px; color: var(--accent); letter-spacing: 0.04em; }
+.choices.invalid .choice { border-color: rgba(255,138,122,0.55); }
+
+.schedule { padding: 16px 18px; border-radius: 8px; border: 1px dashed var(--line-strong); color: var(--soft); font-size: 15px; display: flex; gap: 12px; align-items: baseline; flex-wrap: wrap; }
+.schedule strong { font-family: var(--font-display); font-weight: var(--w-heavy); color: var(--fg); }
+
+.agree { display: grid; grid-template-columns: 22px 1fr; gap: 14px; align-items: start; padding: 20px; border-radius: 8px; background: var(--ink-raised); border: 1px solid var(--line); cursor: pointer; }
+.agree input { width: 20px; height: 20px; margin: 2px 0 0; accent-color: var(--accent); cursor: pointer; }
+.agree a { color: var(--accent); }
+.submit-row { display: flex; flex-wrap: wrap; gap: 16px 24px; align-items: center; padding-top: 8px; }
+.submit-row .hint { max-width: 40ch; }
+.summary-error { padding: 16px 20px; border-radius: 8px; border: 1px solid var(--error); color: var(--error); font-size: 15px; }
+
+/* Confirmation */
+.done-panel { display: flex; flex-direction: column; gap: 32px; }
+.done-panel .badge { width: 56px; height: 56px; border-radius: 50%; background: var(--accent); color: var(--on-accent); display: grid; place-items: center; }
+.done-panel h2 { font-weight: var(--w-light); font-size: clamp(36px, 5vw, 60px); letter-spacing: -0.03em; line-height: 1.02; }
+.done-panel h2 strong { display: block; font-weight: var(--w-heavy); color: var(--accent); }
+.recap { margin: 0; display: grid; grid-template-columns: 220px minmax(0, 1fr); border-top: 1px solid var(--line); }
+.recap dt, .recap dd { margin: 0; padding: 14px 0; border-bottom: 1px solid var(--line); }
+.recap dt { color: var(--muted); font-size: 15px; padding-right: 16px; }
+.recap dd { overflow-wrap: anywhere; white-space: pre-line; }
+.preview-note { color: var(--muted); font-size: 14px; }
+
+footer { border-top: 1px solid var(--line); }
+.foot { display: flex; flex-wrap: wrap; gap: 16px 32px; justify-content: space-between; padding-block: 32px; color: var(--muted); font-size: 15px; }
+.foot a { color: var(--soft); text-decoration: none; }
+
+@media (max-width: 960px) {
+  .layout { grid-template-columns: minmax(0, 1fr); }
+  .rail { position: static; }
+  .progress { display: none; }
+  .choices.three { grid-template-columns: minmax(0, 1fr); }
+  .company { flex-direction: row; }
+  .company .img { width: 110px; height: auto; flex: none; }
+  .company .body { padding: 16px 18px 16px 44px; justify-content: center; }
+  .company input { top: 50%; left: 124px; transform: translateY(-50%); }
+}
+@media (max-width: 640px) {
+  .row, .choices.two { grid-template-columns: minmax(0, 1fr); }
+  .recap { grid-template-columns: minmax(0, 1fr); }
+  .recap dt { border-bottom: 0; padding-bottom: 0; }
+  .nav-right .hide-sm { display: none; }
+  .company .img { width: 84px; }
+  .company input { left: 98px; }
+}
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } * { transition: none !important; } }
+.foot { align-items: center; }
+.to-top { display: inline-flex; align-items: center; gap: 10px; min-height: 44px; padding: 0 20px; border-radius: 999px; background: transparent; border: 1px solid #323A4A; color: #F5F6F8; font-family: var(--font-display); font-weight: 800; font-size: 15px; cursor: pointer; transition: border-color .2s ease, transform .2s ease; }
+.to-top:hover { border-color: #A3AAB8; transform: translateY(-1px); }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="hero-media" aria-hidden="true" data-img="images/header-apply.jpg"><span>Still from clan footage</span></div>
+  <div class="hero-shade" aria-hidden="true"></div>
+  <div class="wrap">
+    <nav class="nav" aria-label="Main">
+      <a class="logo" href="./" aria-label="UNKSO home"><img src="unkso-logo.png" alt="UNKSO" width="160" height="40"></a>
+      <div class="nav-right">
+        <a href="./">← Back to home</a>
+        <a class="hide-sm" href="#">Discord</a>
+      </div>
+    </nav>
+  </div>
+  <div class="wrap hero-body">
+    <div class="signal mono">Enlistment · 18+</div>
+    <h1>Join the<strong>Unknown Soldiers.</strong></h1>
+    <p>Four short sections, about five minutes. A recruiter will message you on Discord within [X] days to talk it through.</p>
+  </div>
+</header>
+
+<main class="wrap layout">
+  <aside class="rail" aria-label="Application progress">
+    <ol class="progress" id="progress">
+      <li><a href="#s-about" data-sec="s-about" aria-current="step"><span class="dot"><span class="n">1</span><svg class="tick" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true"><path d="m5 12 5 5 9-10"/></svg></span><span class="label">About you</span></a></li>
+      <li><a href="#s-company" data-sec="s-company"><span class="dot"><span class="n">2</span><svg class="tick" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true"><path d="m5 12 5 5 9-10"/></svg></span><span class="label">Your company</span></a></li>
+      <li><a href="#s-background" data-sec="s-background"><span class="dot"><span class="n">3</span><svg class="tick" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true"><path d="m5 12 5 5 9-10"/></svg></span><span class="label">Your background</span></a></li>
+      <li><a href="#s-commit" data-sec="s-commit"><span class="dot"><span class="n">4</span><svg class="tick" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true"><path d="m5 12 5 5 9-10"/></svg></span><span class="label">Commitment</span></a></li>
+    </ol>
+    <div class="rail-note">
+      <h2>What happens next</h2>
+      <ol>
+        <li>A recruiter reviews your application.</li>
+        <li>You have a relaxed chat on Discord. No tryout.</li>
+        <li>You complete basic training, then join your first FTX.</li>
+      </ol>
+    </div>
+  </aside>
+
+  <div>
+    <form id="apply-form" novalidate>
+      <div class="summary-error" id="summary-error" role="alert" hidden></div>
+
+      <!-- 1 ABOUT YOU -->
+      <fieldset id="s-about" data-sec="s-about">
+        <legend class="section-head">
+          <span class="mono">Section 1 of 4</span>
+          <h2>About you</h2>
+          <p>The basics, so your recruiter knows who they’re talking to.</p>
+        </legend>
+        <div class="row">
+          <div class="field">
+            <label for="f-name">Name</label>
+            <input type="text" id="f-name" name="name" autocomplete="given-name" required placeholder="e.g. Alex">
+            <p class="hint" id="f-name-hint">Your first name is fine.</p>
+            <p class="error" id="f-name-err" hidden></p>
+          </div>
+          <div class="field">
+            <label for="f-email">Email</label>
+            <input type="email" id="f-email" name="email" autocomplete="email" required placeholder="you@example.com">
+            <p class="hint" id="f-email-hint">Only used about your application.</p>
+            <p class="error" id="f-email-err" hidden></p>
+          </div>
+        </div>
+        <div class="row">
+          <div class="field">
+            <label for="f-age">Age</label>
+            <input type="number" id="f-age" name="age" inputmode="numeric" min="18" max="99" required placeholder="18+">
+            <p class="hint" id="f-age-hint">UNKSO is for adults only.</p>
+            <p class="error" id="f-age-err" hidden></p>
+          </div>
+          <div class="field">
+            <label for="f-location">Location</label>
+            <input type="text" id="f-location" name="location" autocomplete="address-level2" required placeholder="e.g. Leeds, United Kingdom">
+            <p class="hint" id="f-location-hint">City and country, so we can place you with squads in your time zone.</p>
+            <p class="error" id="f-location-err" hidden></p>
+          </div>
+        </div>
+      </fieldset>
+
+      <!-- 2 COMPANY -->
+      <fieldset id="s-company" data-sec="s-company">
+        <legend class="section-head">
+          <span class="mono">Section 2 of 4</span>
+          <h2>Your company</h2>
+          <p>Pick the game you’ll play most. You can join other companies later.</p>
+        </legend>
+        <div class="field" role="radiogroup" aria-labelledby="company-q" aria-describedby="f-company-err">
+          <span class="q" id="company-q">Chosen company</span>
+          <div class="choices three" id="company-choices">
+            <label class="choice company">
+              <div class="img" aria-hidden="true" data-img="images/card-bravo.jpg"><span>Bravo image</span></div>
+              <input type="radio" name="company" id="f-company-mw4" value="mw4" required>
+              <div class="body"><span class="t">Modern Warfare 4</span><span class="d mono">FTX · Sun 3:30 PM EST</span></div>
+            </label>
+            <label class="choice company">
+              <div class="img" aria-hidden="true" data-img="images/card-charlie.jpg"><span>Charlie image</span></div>
+              <input type="radio" name="company" id="f-company-bf6" value="bf6">
+              <div class="body"><span class="t">Battlefield 6</span><span class="d mono">FTX · Sun 5:00 PM EST</span></div>
+            </label>
+            <label class="choice company">
+              <div class="img" aria-hidden="true" data-img="images/card-delta.jpg"><span>Delta image</span></div>
+              <input type="radio" name="company" id="f-company-eft" value="eft">
+              <div class="body"><span class="t">Escape From Tarkov</span><span class="d mono">FTX · Sun 2:00 PM EST</span></div>
+            </label>
+          </div>
+          <p class="error" id="f-company-err" hidden></p>
+        </div>
+        <div class="row">
+          <div class="field">
+            <label for="f-ign" id="f-ign-label">In-game name</label>
+            <input type="text" id="f-ign" name="ign" required autocomplete="off" spellcheck="false" placeholder="Your in-game name">
+            <p class="hint" id="f-ign-hint">Choose a company to see which ID we need.</p>
+            <p class="error" id="f-ign-err" hidden></p>
+          </div>
+          <div class="field">
+            <label for="f-discord">Discord username</label>
+            <input type="text" id="f-discord" name="discord" required autocomplete="off" spellcheck="false" placeholder="e.g. sharpz_">
+            <p class="hint" id="f-discord-hint">Your recruiter will message you here.</p>
+            <p class="error" id="f-discord-err" hidden></p>
+          </div>
+        </div>
+      </fieldset>
+
+      <!-- 3 BACKGROUND -->
+      <fieldset id="s-background" data-sec="s-background">
+        <legend class="section-head">
+          <span class="mono">Section 3 of 4</span>
+          <h2>Your background</h2>
+          <p>Helps us understand where you’re coming from.</p>
+        </legend>
+        <div class="row">
+          <div class="field">
+            <label for="f-heard">Where did you hear about UNKSO?</label>
+            <select id="f-heard" name="heard" required>
+              <option value="">Choose one</option>
+              <option value="ingame">Played with us in game</option>
+              <option value="member">A friend or current member</option>
+              <option value="discord">Discord</option>
+              <option value="stream">Twitch or YouTube</option>
+              <option value="reddit">Reddit</option>
+              <option value="search">Google or another search engine</option>
+              <option value="other">Somewhere else</option>
+            </select>
+            <p class="error" id="f-heard-err" hidden></p>
+          </div>
+          <div class="field" id="referrer-wrap" hidden>
+            <label for="f-referrer">Who referred you? <span class="opt">Optional</span></label>
+            <input type="text" id="f-referrer" name="referrer" placeholder="Their callsign or Discord name">
+            <p class="hint">We like to thank members who bring people in.</p>
+          </div>
+          <div class="field" id="heard-other-wrap" hidden>
+            <label for="f-heard-other">Where was that? <span class="opt">Optional</span></label>
+            <input type="text" id="f-heard-other" name="heardOther" placeholder="e.g. a forum post">
+          </div>
+        </div>
+        <div class="field">
+          <label for="f-clans">Former clans <span class="opt">Optional</span></label>
+          <textarea id="f-clans" name="clans" rows="3" placeholder="e.g. [Clan name], 2021–2023, left when the clan closed" style="min-height: 110px;"></textarea>
+          <p class="hint">List any clans you’ve been part of and why you moved on. Leave blank if this is your first.</p>
+        </div>
+        <div class="field" role="radiogroup" aria-labelledby="mil-q" aria-describedby="mil-hint f-military-err">
+          <span class="q" id="mil-q">Have you served in the armed forces?</span>
+          <p class="hint" id="mil-hint">This doesn’t affect your application. Many of our members have served, and we like to recognise it.</p>
+          <div class="choices two" id="military-choices">
+            <label class="choice"><input type="radio" name="military" value="serving" required><span class="t">Yes, currently serving</span></label>
+            <label class="choice"><input type="radio" name="military" value="veteran"><span class="t">Yes, veteran</span></label>
+            <label class="choice"><input type="radio" name="military" value="no"><span class="t">No</span></label>
+            <label class="choice"><input type="radio" name="military" value="private"><span class="t">Prefer not to say</span></label>
+          </div>
+          <p class="error" id="f-military-err" hidden></p>
+        </div>
+        <div class="field" id="branch-wrap" hidden>
+          <label for="f-branch">Branch and country <span class="opt">Optional</span></label>
+          <input type="text" id="f-branch" name="branch" placeholder="e.g. British Army, Royal Engineers">
+        </div>
+      </fieldset>
+
+      <!-- 4 COMMITMENT -->
+      <fieldset id="s-commit" data-sec="s-commit">
+        <legend class="section-head">
+          <span class="mono">Section 4 of 4</span>
+          <h2>Commitment</h2>
+          <p>UNKSO runs on people showing up. Tell us why you want in.</p>
+        </legend>
+        <div class="field">
+          <label for="f-why">Why do you want to join UNKSO?</label>
+          <textarea id="f-why" name="why" required minlength="80" maxlength="1500" aria-describedby="why-count f-why-err" placeholder="What are you looking for in a clan, and what will you bring to your squad?"></textarea>
+          <div class="counter" id="why-count" aria-live="polite"><span id="why-min">At least 80 characters</span><span id="why-n">0 / 1500</span></div>
+          <p class="error" id="f-why-err" hidden></p>
+        </div>
+        <div class="schedule" id="schedule">
+          <strong id="schedule-title">Scheduled sessions</strong>
+          <span id="schedule-text">Every member attends the General Meeting on Fridays at 8:30 PM EST. Choose a company in section 2 to see its FTX time.</span>
+        </div>
+        <div class="field" role="radiogroup" aria-labelledby="att-q" aria-describedby="f-attend-err">
+          <span class="q" id="att-q">Can you attend scheduled sessions?</span>
+          <div class="choices" id="attend-choices">
+            <label class="choice"><input type="radio" name="attend" value="most" required><span class="t">Yes, most weeks</span><span class="d">I can make the General Meeting and my company’s FTX most weeks.</span></label>
+            <label class="choice"><input type="radio" name="attend" value="some"><span class="t">Some weeks</span><span class="d">Work or family means I’ll make some, but not all.</span></label>
+            <label class="choice"><input type="radio" name="attend" value="rarely"><span class="t">Rarely</span><span class="d">My schedule is unpredictable right now.</span></label>
+          </div>
+          <p class="error" id="f-attend-err" hidden></p>
+        </div>
+        <div class="field">
+          <label class="agree" for="f-agree">
+            <input type="checkbox" id="f-agree" name="agree" required>
+            <span>I confirm I’m 18 or over and I agree to follow the UNKSO <a href="#">regulations and code of conduct</a>.</span>
+          </label>
+          <p class="error" id="f-agree-err" hidden></p>
+        </div>
+        <div class="submit-row">
+          <button class="btn btn-accent" type="submit">Submit application</button>
+          <p class="hint">Preview only: submitting shows the confirmation screen and sends nothing.</p>
+        </div>
+      </fieldset>
+    </form>
+
+    <section class="done-panel" id="done" hidden aria-live="polite" tabindex="-1">
+      <div class="badge" aria-hidden="true"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="m5 12 5 5 9-10"/></svg></div>
+      <h2>Application received.<strong id="done-name">Welcome, recruit.</strong></h2>
+      <p style="color: var(--soft); max-width: 60ch;">A recruiter will message <strong id="done-discord" style="font-family: var(--font-display); font-weight: var(--w-heavy); color: var(--fg);"></strong> on Discord within [X] days. In the meantime, come and say hello in our public channels.</p>
+      <dl class="recap" id="recap"></dl>
+      <div class="submit-row">
+        <a class="btn btn-accent" href="#">Join our Discord</a>
+        <button class="btn btn-ghost" type="button" id="edit-btn">Edit my answers</button>
+      </div>
+      <p class="preview-note">Preview only. Nothing has been sent.</p>
+    </section>
+  </div>
+</main>
+
+<footer>
+  <div class="wrap foot">
+    <span>© Unknown Soldiers · Built by our Engineering Department</span>
+    <button class="to-top" type="button" onclick="window.scrollTo({ top: 0, behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' })">
+      Back to top
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5M6 11l6-6 6 6"/></svg>
+    </button>
+  </div>
+</footer>
+
+<script>
+(function () {
+  var form = document.getElementById('apply-form');
+  var done = document.getElementById('done');
+  var $ = function (id) { return document.getElementById(id); };
+
+  var COMPANIES = {
+    mw4: { name: 'Modern Warfare 4', idLabel: 'Activision ID', idHint: 'Include the number, e.g. Sharpz#1234567.', idPh: 'Name#1234567', sched: 'FTX on Sundays at 3:30 PM EST, plus the General Meeting on Fridays at 8:30 PM EST.' },
+    bf6: { name: 'Battlefield 6', idLabel: 'EA ID', idHint: 'The name shown on your EA account.', idPh: 'Your EA ID', sched: 'FTX on Sundays at 5:00 PM EST, plus the General Meeting on Fridays at 8:30 PM EST.' },
+    eft: { name: 'Escape From Tarkov', idLabel: 'Tarkov username', idHint: 'Your in-game nickname.', idPh: 'Your Tarkov username', sched: 'FTX on Sundays at 2:00 PM EST, plus the General Meeting on Fridays at 8:30 PM EST.' }
+  };
+  var LABELS = {
+    heard: { ingame: 'Played with us in game', member: 'A friend or current member', discord: 'Discord', stream: 'Twitch or YouTube', reddit: 'Reddit', search: 'Search engine', other: 'Somewhere else' },
+    military: { serving: 'Yes, currently serving', veteran: 'Yes, veteran', no: 'No', private: 'Prefer not to say' },
+    attend: { most: 'Yes, most weeks', some: 'Some weeks', rarely: 'Rarely' }
+  };
+
+  function radioVal(name) { var c = form.querySelector('input[name="' + name + '"]:checked'); return c ? c.value : ''; }
+
+  // ---- Conditional fields ----
+  function syncCompany() {
+    var c = COMPANIES[radioVal('company')];
+    if (!c) return;
+    $('f-ign-label').textContent = c.idLabel;
+    $('f-ign-hint').textContent = c.idHint;
+    $('f-ign').placeholder = c.idPh;
+    $('schedule-title').textContent = c.name;
+    $('schedule-text').textContent = c.sched;
+  }
+  function syncHeard() {
+    var v = $('f-heard').value;
+    $('referrer-wrap').hidden = v !== 'member';
+    $('heard-other-wrap').hidden = v !== 'other';
+  }
+  function syncMilitary() {
+    var v = radioVal('military');
+    $('branch-wrap').hidden = !(v === 'serving' || v === 'veteran');
+  }
+  function syncCount() {
+    var n = $('f-why').value.trim().length;
+    $('why-n').textContent = n + ' / 1500';
+    var min = $('why-min');
+    if (n >= 80) { min.textContent = 'Looks good'; min.className = 'ok'; }
+    else { min.textContent = (80 - n) + ' more characters needed'; min.className = ''; }
+  }
+
+  // ---- Validation ----
+  var RULES = [
+    { id: 'f-name', sec: 's-about', check: function () { return $('f-name').value.trim() ? '' : 'Enter your name.'; } },
+    { id: 'f-email', sec: 's-about', check: function () { var v = $('f-email').value.trim(); if (!v) return 'Enter your email address.'; return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v) ? '' : 'Enter an email address like you@example.com.'; } },
+    { id: 'f-age', sec: 's-about', check: function () { var v = $('f-age').value; if (!v) return 'Enter your age.'; var n = Number(v); if (!Number.isInteger(n) || n > 99) return 'Enter your age as a whole number.'; return n < 18 ? 'You need to be 18 or over to join UNKSO.' : ''; } },
+    { id: 'f-location', sec: 's-about', check: function () { return $('f-location').value.trim() ? '' : 'Enter your city and country.'; } },
+    { id: 'f-company', group: 'company-choices', sec: 's-company', check: function () { return radioVal('company') ? '' : 'Choose the company you want to join.'; } },
+    { id: 'f-ign', sec: 's-company', check: function () { var c = COMPANIES[radioVal('company')]; return $('f-ign').value.trim() ? '' : 'Enter your ' + (c ? c.idLabel : 'in-game name') + '.'; } },
+    { id: 'f-discord', sec: 's-company', check: function () { var v = $('f-discord').value.trim(); if (!v) return 'Enter your Discord username.'; return /\s/.test(v) ? 'Discord usernames can’t contain spaces.' : ''; } },
+    { id: 'f-heard', sec: 's-background', check: function () { return $('f-heard').value ? '' : 'Tell us where you heard about UNKSO.'; } },
+    { id: 'f-military', group: 'military-choices', sec: 's-background', check: function () { return radioVal('military') ? '' : 'Choose an answer, or pick “Prefer not to say”.'; } },
+    { id: 'f-why', sec: 's-commit', check: function () { var n = $('f-why').value.trim().length; if (!n) return 'Tell us why you want to join.'; return n < 80 ? 'Write at least 80 characters so your recruiter has something to go on.' : ''; } },
+    { id: 'f-attend', group: 'attend-choices', sec: 's-commit', check: function () { return radioVal('attend') ? '' : 'Choose how often you can attend.'; } },
+    { id: 'f-agree', sec: 's-commit', check: function () { return $('f-agree').checked ? '' : 'Confirm you’re 18 or over and agree to the code of conduct.'; } }
+  ];
+
+  function show(rule, msg) {
+    var err = $(rule.id + '-err');
+    if (err) { err.textContent = msg; err.hidden = !msg; }
+    if (rule.group) {
+      $(rule.group).classList.toggle('invalid', !!msg);
+    } else {
+      var el = $(rule.id);
+      if (msg) {
+        el.setAttribute('aria-invalid', 'true');
+        el.setAttribute('aria-describedby', rule.id + '-err');
+      } else {
+        el.removeAttribute('aria-invalid');
+        var hint = $(rule.id + '-hint');
+        if (hint) el.setAttribute('aria-describedby', rule.id + '-hint'); else el.removeAttribute('aria-describedby');
+      }
+    }
+  }
+  var touched = {};
+  function revalidate(rule) { if (touched[rule.id]) show(rule, rule.check()); }
+
+  // ---- Progress rail ----
+  var links = Array.prototype.slice.call(document.querySelectorAll('#progress a'));
+  function syncProgress() {
+    var bySec = {};
+    RULES.forEach(function (r) { bySec[r.sec] = (bySec[r.sec] !== false) && !r.check(); });
+    links.forEach(function (a) { a.classList.toggle('done', !!bySec[a.dataset.sec]); });
+  }
+  if ('IntersectionObserver' in window) {
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (e.isIntersecting) links.forEach(function (a) {
+          if (a.dataset.sec === e.target.id) a.setAttribute('aria-current', 'step'); else a.removeAttribute('aria-current');
+        });
+      });
+    }, { rootMargin: '-35% 0px -55% 0px' });
+    document.querySelectorAll('fieldset[data-sec]').forEach(function (f) { io.observe(f); });
+  }
+
+  // ---- Events ----
+  form.addEventListener('input', function (e) {
+    var t = e.target;
+    if (t.name === 'company') syncCompany();
+    if (t.id === 'f-heard') syncHeard();
+    if (t.name === 'military') syncMilitary();
+    if (t.id === 'f-why') syncCount();
+    RULES.forEach(revalidate);
+    syncProgress();
+  });
+  form.addEventListener('change', function (e) {
+    var t = e.target;
+    if (t.type === 'radio' || t.type === 'checkbox' || t.tagName === 'SELECT') {
+      var key = t.type === 'radio' ? 'f-' + t.name : t.id;
+      touched[key] = true;
+    }
+    form.dispatchEvent(new Event('input'));
+  });
+  form.addEventListener('focusout', function (e) {
+    var t = e.target; if (!t.id) return;
+    var rule = RULES.filter(function (r) { return r.id === t.id; })[0];
+    if (rule && (t.value || touched[t.id])) { touched[t.id] = true; show(rule, rule.check()); }
+  });
+
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+    var first = null, count = 0;
+    RULES.forEach(function (r) {
+      touched[r.id] = true;
+      var msg = r.check(); show(r, msg);
+      if (msg) { count++; if (!first) first = r; }
+    });
+    var summary = $('summary-error');
+    if (first) {
+      summary.textContent = count === 1 ? 'One answer needs fixing before you can submit.' : count + ' answers need fixing before you can submit.';
+      summary.hidden = false;
+      var target = first.group ? $(first.group).querySelector('input') : $(first.id);
+      target.focus({ preventScroll: true });
+      target.closest('.field').scrollIntoView({ behavior: 'smooth', block: 'center' });
+      return;
+    }
+    summary.hidden = true;
+    showDone();
+  });
+
+  function showDone() {
+    var name = $('f-name').value.trim();
+    var c = COMPANIES[radioVal('company')];
+    $('done-name').textContent = 'Welcome, ' + name + '.';
+    $('done-discord').textContent = $('f-discord').value.trim();
+    var heard = LABELS.heard[$('f-heard').value];
+    if ($('f-heard').value === 'member' && $('f-referrer').value.trim()) heard += ' (' + $('f-referrer').value.trim() + ')';
+    if ($('f-heard').value === 'other' && $('f-heard-other').value.trim()) heard += ' (' + $('f-heard-other').value.trim() + ')';
+    var mil = LABELS.military[radioVal('military')];
+    if ($('f-branch').value.trim() && !$('branch-wrap').hidden) mil += ', ' + $('f-branch').value.trim();
+    var rows = [
+      ['Name', name], ['Email', $('f-email').value.trim()], ['Age', $('f-age').value], ['Location', $('f-location').value.trim()],
+      ['Company', c.name], [c.idLabel, $('f-ign').value.trim()], ['Discord', $('f-discord').value.trim()],
+      ['Heard about us', heard], ['Former clans', $('f-clans').value.trim() || 'None'], ['Military service', mil],
+      ['Why UNKSO', $('f-why').value.trim()], ['Scheduled sessions', LABELS.attend[radioVal('attend')]]
+    ];
+    var dl = $('recap'); dl.textContent = '';
+    rows.forEach(function (r) {
+      var dt = document.createElement('dt'); dt.textContent = r[0];
+      var dd = document.createElement('dd'); dd.textContent = r[1];
+      dl.appendChild(dt); dl.appendChild(dd);
+    });
+    form.hidden = true; done.hidden = false;
+    links.forEach(function (a) { a.classList.add('done'); a.removeAttribute('aria-current'); });
+    done.focus({ preventScroll: true });
+    done.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+  $('edit-btn').addEventListener('click', function () {
+    done.hidden = true; form.hidden = false; syncProgress();
+    $('s-about').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    $('f-name').focus({ preventScroll: true });
+  });
+
+  // Preselect a company when arriving from a company page (apply.html#mw4, #bf6 or #eft)
+  var pre = (location.hash || '').slice(1);
+  if (COMPANIES[pre]) { var r = $('f-company-' + pre); if (r) r.checked = true; }
+
+  // Initial state (covers values restored by the browser)
+  syncCompany(); syncHeard(); syncMilitary(); syncCount(); syncProgress();
+})();
+</script>
+<script src="js/images.js"></script>
+</body>
+</html>
