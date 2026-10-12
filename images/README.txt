@@ -9,8 +9,11 @@ Cloudflare Pages redeploys automatically a minute or so later.
 Filenames are lower case and must match exactly (card-bravo.jpg, not Card-Bravo.JPG).
 
 HOMEPAGE (index.html)
-  home-hero.mp4        Hero video: 10-20 s, silent, MP4 (H.264), under ~5 MB. Optional.
-  home-hero.jpg        Hero still: 1920x1080. Shown while the video loads, or on its own.
+  home-hero-1.jpg      Hero carousel, 1920x1080 each. Add as many as you like:
+  home-hero-2.jpg        home-hero-1.jpg, home-hero-2.jpg, home-hero-3.jpg and so on.
+  home-hero-3.jpg        They fade to the next every 6 seconds and loop. Number them
+                         with no gaps: the site stops at the first missing number.
+                         To change the order, rename the files.
   card-bravo.jpg       Bravo Company card (MW4):   900x1200, portrait
   card-charlie.jpg     Charlie Company card (BF6): 900x1200, portrait
   card-delta.jpg       Delta Company card (EFT):   900x1200, portrait

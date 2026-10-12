@@ -130,17 +130,11 @@ footer { border-top: 1px solid var(--line); }
 
 .page { display: flex; flex-direction: column; gap: 32px; padding-block: 40px 120px; }
 
-/* Ladder: every rank in order, lowest to highest */
-.ladder { padding: 22px 24px; border-radius: 16px; background: var(--panel); border: 1px solid var(--line); }
-.ladder-head { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px 24px; align-items: baseline; margin-bottom: 16px; }
-.ladder-head h2 { font-weight: var(--w-heavy); font-size: 20px; }
-.ladder-head p { color: var(--muted); font-size: 14px; }
-.ladder ol { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 18px 14px; }
-.ladder .grp { display: flex; flex-direction: column; gap: 10px; }
-.ladder .grp-name { font-family: var(--font-mono); font-size: 11px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); padding-bottom: 8px; border-bottom: 2px solid var(--line-strong); }
-.ladder .grp ul { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px; }
-.ladder a { display: grid; place-items: center; min-width: 52px; min-height: 40px; padding: 0 10px; border-radius: 8px; background: var(--head); border: 1px solid var(--line); text-decoration: none; font-family: var(--font-mono); font-size: 13px; color: var(--soft); transition: border-color .15s ease, color .15s ease, background-color .15s ease; }
-.ladder a:hover { border-color: var(--accent); color: var(--fg); }
+/* Jump bar: rank groups, then a divider, then Promotion Requirements */
+.jump-inner { align-items: center; }
+.jump-divider { flex: none; align-self: stretch; width: 1px; margin: 6px 10px; background: var(--line-strong); }
+.jump a.jump-info { background: transparent; border-style: dashed; }
+.jump a.jump-info svg { color: var(--muted); }
 
 /* Rank groups reuse the Command List panel */
 .cat-count { flex: none; font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; color: #FFFFFF; }
@@ -179,7 +173,6 @@ td.tbc { color: var(--muted); }
   .rank-body { padding: 14px 14px 18px; }
   .rank h3 { font-size: 17px; }
   .promo-body { padding: 4px 16px 18px; }
-  .ladder { padding: 18px; }
 }
 @media (max-width: 860px) {
   .nav-links { display: none; }
@@ -248,14 +241,6 @@ td.tbc { color: var(--muted); }
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
     <span><strong>Read only.</strong> Ranks and promotion requirements are set by Command. Questions about your next promotion? Ask your Squad Leader.</span>
   </div>
-
-  <section class="ladder" aria-labelledby="ladder-title">
-    <div class="ladder-head">
-      <h2 id="ladder-title">The full ladder</h2>
-      <p>Lowest to highest. Select a rank to jump to it.</p>
-    </div>
-    <ol id="ladder"></ol>
-  </section>
 
   <div id="groups" style="display: flex; flex-direction: column; gap: 32px;"></div>
 
@@ -347,7 +332,7 @@ td.tbc { color: var(--muted); }
     UNKSO.list().forEach(function (m) { (holders[m.rank] = holders[m.rank] || []).push(m); });
   }
 
-  var total = 0, ladder = '', groups = '', jump = '';
+  var total = 0, groups = '', jump = '';
   GROUPS.forEach(function (g) {
     total += g.ranks.length;
     jump += '<a href="#' + g.id + '">' + esc(g.title) + '</a>';
@@ -364,14 +349,12 @@ td.tbc { color: var(--muted); }
           (who.length ? '<div class="held" aria-label="Held by">' + who.map(function (m) { return '<span>' + esc(UNKSO.displayName(m)) + '</span>'; }).join('') + '</div>' : '') +
           '</div></article>';
       }).join('') + '</div></section>';
-    ladder += '<li class="grp"><span class="grp-name">' + esc(g.id === 'nco' ? 'NCOs' : g.title) + '</span><ul>' +
-      g.ranks.map(function (r) { return '<li><a href="#r-' + slug(r[0]) + '" title="' + esc(r[1]) + '">' + esc(r[0]) + '</a></li>'; }).join('') + '</ul></li>';
   });
-  jump += '<a href="#promotion">Promotion Requirements</a>';
+  jump += '<span class="jump-divider" role="separator" aria-orientation="vertical"></span>' +
+    '<a class="jump-info" href="#promotion"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 17 9 11l4 4 8-8"/><path d="M15 7h6v6"/></svg>Promotion Requirements</a>';
 
   document.getElementById('groups').innerHTML = groups;
-  document.getElementById('ladder').innerHTML = ladder;
-  document.getElementById('jump').innerHTML = jump;
+    document.getElementById('jump').innerHTML = jump;
   document.getElementById('n-ranks').textContent = total;
   document.getElementById('promo-rows').innerHTML = PROMOTIONS.map(function (p) {
     return '<tr><td>' + esc(p[0]) + '</td>' + [p[1], p[2]].map(function (v) {
