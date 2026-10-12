@@ -20,13 +20,15 @@ Static website for Unknown Soldiers (UNKSO). Plain HTML, CSS and JavaScript, wit
 | `index.html` | Homepage |
 | `apply.html` | Application form (mockup, sends nothing yet) |
 | `forums.html` | Forum index (mockup with sample "New" flags) |
-| `perscom.html` | PERSCOM index (mockup, inner pages not built yet) |
+| `perscom.html` | PERSCOM index (mockup; Ranks is built, other inner pages not yet) |
+| `ranks.html` | Ranks: every rank by group, insignia, who holds each rank, promotion requirements |
 | `company-mw4.html` | Bravo Company (Modern Warfare 4) |
 | `company-bf6.html` | Charlie Company (Battlefield 6) |
 | `company-eft.html` | Delta Company (Escape From Tarkov) |
 | `admin.html` | Console: manage company members (demo) |
 | `js/store.js` | Demo data store for the Console and company pages |
 | `js/images.js` | Loads images from `images/` when they exist |
+| `js/motion.js` | Subtle animations: hero follows the cursor, company card hover, scroll reveal, stat count-up |
 | `images/` | Put site images here. See `images/README.txt` for the filenames |
 
 ## Images
@@ -53,7 +55,8 @@ Open it with the padlock icon in the top menu. Pick a role when signing in:
 ## Still to fill in
 
 - **Homepage:** the story behind the name "Unknown Soldiers", and the Discord invite link for the Join Discord buttons
-- **Application form:** the recruiter reply time ([X] days) and the example clan name
+- **Ranks page:** the rank insignia images, the short description of each rank (written as a starting point, so check they match how UNKSO uses each rank), and the promotion requirements table (marked "To be confirmed")
+- **Application form:** the recruiter reply time ([X] days), the example clan name, and in the privacy note how long unsuccessful applications are kept ([X] days) and a contact email ([CONTACT EMAIL])
 - **Company pages:** the platform for MW4 and BF6
 - **Forums and PERSCOM:** replace the sample "New"/"Updated" flags once they're connected to real data
 

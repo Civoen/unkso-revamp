@@ -267,7 +267,7 @@ footer { border-top: 1px solid var(--line); }
           New topic
         </a>
         <a class="btn btn-ghost" href="#discharges">Request leave of absence</a>
-        <a class="btn btn-ghost" href="#">Read the regulations</a>
+        <a class="btn btn-ghost" href="perscom.html#regulations">Read the regulations</a>
       </div>
     </section>
 
@@ -320,6 +320,7 @@ footer { border-top: 1px solid var(--line); }
     scale: '<path d="M12 3v18M7 21h10M5 7h14M5 7l-3 7a3 3 0 0 0 6 0Zm14 0-3 7a3 3 0 0 0 6 0Z"/>',
     lock: '<rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/>',
     eye: '<path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/>',
+    doc: '<path d="M6 3h8l4 4v14H6Z"/><path d="M14 3v4h4M9 12h6M9 16h6"/>',
     arrow: '<path d="M5 12h14M13 6l6 6-6 6"/>'
   };
   function svg(name, size, sw) {
@@ -330,9 +331,8 @@ footer { border-top: 1px solid var(--line); }
   // isNew: board has posts since the member's last visit (sample state for the mockup).
   // newSubs: which sub-boards have the new posts.
   var CATEGORIES = [
-    { id: 'welcome', icon: 'flag', title: 'Welcome', desc: 'Start here. News from Command, our regulations and a place to introduce yourself.', boards: [
+    { id: 'welcome', icon: 'flag', title: 'Welcome', desc: 'Start here. News from Command, a place to introduce yourself and the way in for recruits.', boards: [
       { id: 'announcements', icon: 'megaphone', title: 'Announcements', desc: 'News, orders and updates from Command.', isNew: true },
-      { id: 'regs', icon: 'book', title: 'Rules & Regulations', desc: 'The UNKSO regulations, code of conduct, and customs and courtesies.' },
       { id: 'intros', icon: 'hand', title: 'Introductions', desc: 'New here? Say hello and tell us a bit about yourself.', isNew: true },
       { id: 'recruitment', icon: 'clipboard', title: 'Recruitment Office', desc: 'Application status, recruiter questions and basic training.', subs: ['Applications', 'Basic Training', 'Recruiter Lounge'] }
     ]},
@@ -342,11 +342,12 @@ footer { border-top: 1px solid var(--line); }
       { id: 'other', icon: 'pad', title: 'Other Titles', desc: 'Squad, Arma, Hell Let Loose and whatever else we’re playing.' },
       { id: 'tech', icon: 'wrench', title: 'Tech Support', desc: 'PC builds, game settings, Discord and voice comms help.' }
     ]},
-    { id: 'promotions', icon: 'medal', title: 'Promotions & Awards', desc: 'Official orders and recognition. Promotions are earned, never handed out.', boards: [
-      { id: 'promos', icon: 'chevrons', title: 'Promotions', desc: 'Official promotion orders, posted monthly by Command.', isNew: true },
-      { id: 'citations', icon: 'medal', title: 'Awards', desc: 'Awards and decorations, with the citations behind them.' },
-      { id: 'nominations', icon: 'star', title: 'Award Nominations', desc: 'Nominate a fellow member whose service deserves recognition.', access: 'members' }
-    ]},
+    { id: 'information', icon: 'book', title: 'Information', desc: 'The essentials every member should know, kept up to date by Command.', boards: [
+      { id: 'info-regs', icon: 'book', title: 'Regulations', desc: 'The UNKSO regulations, code of conduct, and customs and courtesies.', href: 'perscom.html#regulations' },
+      { id: 'info-ranks', icon: 'chevrons', title: 'Ranks', desc: 'Every rank from Recruit to Colonel, with insignia and how each is earned.', href: 'ranks.html' },
+      { id: 'info-awards', icon: 'medal', title: 'Ribbons/Awards', desc: 'Ribbons, awards and medals, and what it takes to earn them.', href: 'perscom.html#awards' },
+      { id: 'info-docs', icon: 'doc', title: 'Documents', desc: 'Handbooks, BCT guides, NCO resources and clan history.', href: 'perscom.html#documents' }
+    ] },
     { id: 'companies', icon: 'shield', title: 'Companies', desc: 'Each company runs its own briefings, after-action reports and tactics.', boards: [
       { id: 'mw4', icon: 'crosshair', title: 'Modern Warfare 4', desc: 'FTX every Sunday at 3:30 PM EST.', isNew: true, subs: ['FTX Briefings', 'After Action Reports', 'Loadouts & Tactics', 'Company Roster'], newSubs: ['FTX Briefings'] },
       { id: 'bf6', icon: 'crosshair', title: 'Battlefield 6', desc: 'FTX every Sunday at 5:00 PM EST.', subs: ['FTX Briefings', 'After Action Reports', 'Loadouts & Tactics', 'Company Roster'] },
@@ -387,7 +388,7 @@ footer { border-top: 1px solid var(--line); }
       var n = fresh && b.newSubs && b.newSubs.indexOf(s) !== -1;
       return '<span' + (n ? ' class="new"' : '') + '>' + hl(s, q) + '</span>';
     }).join('') + '</span>' : '';
-    return '<li><a class="board-link' + (fresh ? ' is-new' : '') + '" href="#" data-board="' + b.id + '"' + (fresh ? ' aria-label="' + esc(b.title) + ', new posts"' : '') + '>' +
+    return '<li><a class="board-link' + (fresh ? ' is-new' : '') + '" href="' + esc(b.href || '#') + '" data-board="' + b.id + '"' + (fresh ? ' aria-label="' + esc(b.title) + ', new posts"' : '') + '>' +
       '<span class="b-icon">' + svg(b.icon) + '</span>' +
       '<span class="b-main"><span class="b-title">' + hl(b.title, q) + (fresh ? '<span class="pill new">New</span>' : '') + (b.access ? ACCESS[b.access] : '') + '</span>' +
       '<span class="b-desc">' + hl(b.desc, q) + '</span>' + subs + '</span>' +
@@ -455,6 +456,8 @@ footer { border-top: 1px solid var(--line); }
     // Opening a board marks it as read (stands in for visiting the board page)
     var link = e.target.closest('.board-link');
     if (link) {
+      var bid0 = link.getAttribute('data-board');
+      if (link.getAttribute('href') !== '#') { read[bid0] = true; save('unkso-forum-read', read); return; }
       e.preventDefault();
       var bid = link.getAttribute('data-board');
       if (!read[bid]) { read[bid] = true; save('unkso-forum-read', read); render(search.value); }
@@ -502,5 +505,6 @@ footer { border-top: 1px solid var(--line); }
 })();
 </script>
 <script src="js/images.js"></script>
+<script src="js/motion.js"></script>
 </body>
 </html>

@@ -350,10 +350,10 @@ footer { border-top: 1px solid var(--line); }
       { id: 'leave', icon: 'plane', title: 'Leave, Discharge & Retirement Policy', desc: 'How to request leave, transfer between companies, take a discharge or retire from the clan.' }
     ]},
     { id: 'ranks', icon: 'chevrons', title: 'Ranks', desc: 'The rank structure, what each rank is responsible for and how to earn the next one.', items: [
-      { id: 'enlisted', icon: 'chevron1', title: 'Enlisted Ranks', desc: 'From Recruit through the junior enlisted ranks, with insignia.' },
-      { id: 'nco', icon: 'chevron3', title: 'Non-Commissioned Officers', desc: 'NCO ranks and their responsibilities as squad and team leaders.' },
-      { id: 'officers', icon: 'bars', title: 'Officers', desc: 'Officer ranks and their roles in running companies and the clan.' },
-      { id: 'promotion', icon: 'trend', title: 'Promotion Requirements', desc: 'Time in service, attendance and training needed for each promotion.', updated: 'Requirements updated for NCO ranks' }
+      { id: 'enlisted', href: 'ranks.html#enlisted', icon: 'chevron1', title: 'Enlisted Ranks', desc: 'From Recruit through the junior enlisted ranks, with insignia.' },
+      { id: 'nco', href: 'ranks.html#nco', icon: 'chevron3', title: 'Non-Commissioned Officers', desc: 'NCO ranks and their responsibilities as squad and team leaders.' },
+      { id: 'officers', href: 'ranks.html#officers', icon: 'bars', title: 'Officers', desc: 'Officer ranks and their roles in running companies and the clan.' },
+      { id: 'promotion', href: 'ranks.html#promotion', icon: 'trend', title: 'Promotion Requirements', desc: 'Time in service, attendance and training needed for each promotion.', updated: 'Requirements updated for NCO ranks' }
     ]},
     { id: 'awards', icon: 'medal', title: 'Awards', desc: 'Every award the clan gives, what it looks like and how it is earned.', items: [
       { id: 'ribbons', icon: 'ribbon', title: 'Ribbons', desc: 'Ribbons for service, campaigns and contributions to the clan.' },
@@ -383,7 +383,7 @@ footer { border-top: 1px solid var(--line); }
 
   function itemHTML(it, q) {
     var subs = it.subs ? '<span class="subs">' + it.subs.map(function (s) { return '<span>' + hl(s, q) + '</span>'; }).join('') + '</span>' : '';
-    return '<li class="row"><a class="board-link' + (it.updated ? ' is-new' : '') + '" href="#" data-item="' + it.id + '">' +
+    return '<li class="row"><a class="board-link' + (it.updated ? ' is-new' : '') + '" href="' + esc(it.href || '#') + '" data-item="' + it.id + '">' +
       '<span class="b-icon">' + svg(it.icon) + '</span>' +
       '<span class="b-main"><span class="b-title">' + hl(it.title, q) +
         (it.updated ? '<span class="pill new">Updated</span>' : '') +
@@ -452,7 +452,7 @@ footer { border-top: 1px solid var(--line); }
     var add = e.target.closest('[data-add]');
     if (add) { say('Mockup: this would add a new page to ' + add.getAttribute('data-add') + '.'); return; }
     var link = e.target.closest('.board-link');
-    if (link) { e.preventDefault(); say('Mockup: this would open the page.'); }
+    if (link && link.getAttribute('href') === '#') { e.preventDefault(); say('Mockup: this would open the page.'); }
   });
   jump.addEventListener('click', function (e) {
     var a = e.target.closest('a[data-jump]');
@@ -498,5 +498,6 @@ footer { border-top: 1px solid var(--line); }
 })();
 </script>
 <script src="js/images.js"></script>
+<script src="js/motion.js"></script>
 </body>
 </html>

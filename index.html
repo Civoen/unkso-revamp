@@ -1,3 +1,10 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Unknown Soldiers (UNKSO): a Milsim gaming community since 2004. Modern Warfare 4, Battlefield 6 and Escape From Tarkov.">
+<style>body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
 <title>UNKSO Homepage</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -193,13 +200,11 @@ section { position: relative; }
 .op-sub { color: var(--muted); font-size: 15px; }
 
 /* Quote band */
-.quote-band {
-  min-height: 640px; display: flex; align-items: center; overflow: hidden;
-  background: repeating-linear-gradient(135deg, var(--placeholder-a) 0 18px, var(--placeholder-b) 18px 36px);
-}
+.quote-band { min-height: 640px; display: flex; align-items: center; overflow: hidden; }
+.quote-media { position: absolute; inset: 0; z-index: 0; background: repeating-linear-gradient(135deg, var(--placeholder-a) 0 18px, var(--placeholder-b) 18px 36px); }
 .quote-band .ph-label { top: 24px; right: var(--gutter); }
-.quote-band::before { content: ""; position: absolute; inset: 0; background: rgba(7,9,13,0.74); }
-.quote-band figure { position: relative; margin: 0 auto; max-width: 1000px; text-align: center; display: flex; flex-direction: column; gap: 28px; align-items: center; }
+.quote-band::before { content: ""; position: absolute; inset: 0; z-index: 1; background: rgba(7,9,13,0.74); pointer-events: none; }
+.quote-band figure { position: relative; z-index: 2; margin: 0 auto; max-width: 1000px; text-align: center; display: flex; flex-direction: column; gap: 28px; align-items: center; }
 .quote-band blockquote { margin: 0; font-weight: var(--w-light); font-size: clamp(30px, 4.4vw, 54px); line-height: 1.16; letter-spacing: -0.02em; text-wrap: balance; }
 .quote-band figcaption { font-family: var(--font-mono); font-size: 14px; color: var(--accent); letter-spacing: 0.06em; }
 
@@ -266,7 +271,8 @@ footer { border-top: 1px solid var(--line); }
 .to-top { display: inline-flex; align-items: center; gap: 10px; min-height: 44px; padding: 0 20px; border-radius: 999px; background: transparent; border: 1px solid #323A4A; color: #F5F6F8; font-family: var(--font-display); font-weight: 800; font-size: 15px; cursor: pointer; transition: border-color .2s ease, transform .2s ease; }
 .to-top:hover { border-color: #A3AAB8; transform: translateY(-1px); }
 </style>
-
+</head>
+<body>
 <div class="page">
 
 <!-- ================= HERO ================= -->
@@ -346,7 +352,7 @@ footer { border-top: 1px solid var(--line); }
   <div class="wrap">
     <div class="chapter-head"><span class="num">02</span><h2 class="eyebrow" id="div-title">Companies</h2></div>
     <div class="divisions">
-      <a class="division" href="company-mw4.html" data-img="images/card-bravo.jpg">
+      <a class="division" href="company-mw4.html" data-img="images/card-bravo.jpg" data-tilt>
         <span class="ph-label">Portrait key image</span>
         <div class="division-body">
           <div class="meta">FTX · Sundays · 3:30 PM EST</div>
@@ -355,7 +361,7 @@ footer { border-top: 1px solid var(--line); }
           <div class="go">Explore company <span aria-hidden="true">→</span></div>
         </div>
       </a>
-      <a class="division" href="company-bf6.html" data-img="images/card-charlie.jpg">
+      <a class="division" href="company-bf6.html" data-img="images/card-charlie.jpg" data-tilt>
         <span class="ph-label">Portrait key image</span>
         <div class="division-body">
           <div class="meta">FTX · Sundays · 5:00 PM EST</div>
@@ -364,7 +370,7 @@ footer { border-top: 1px solid var(--line); }
           <div class="go">Explore company <span aria-hidden="true">→</span></div>
         </div>
       </a>
-      <a class="division" href="company-eft.html" data-img="images/card-delta.jpg">
+      <a class="division" href="company-eft.html" data-img="images/card-delta.jpg" data-tilt>
         <span class="ph-label">Portrait key image</span>
         <div class="division-body">
           <div class="meta">FTX · Sundays · 2:00 PM EST</div>
@@ -389,8 +395,8 @@ footer { border-top: 1px solid var(--line); }
 </section>
 
 <!-- ================= 03 FROM THE RANKS ================= -->
-<section class="quote-band" aria-labelledby="ranks-title" data-img="images/home-quote.jpg">
-  <span class="ph-label">Wide still · squad at dusk</span>
+<section class="quote-band" aria-labelledby="ranks-title">
+  <div class="quote-media" aria-hidden="true" data-img="images/home-quote.jpg"><span class="ph-label">Wide still · squad at dusk</span></div>
   <div class="wrap" style="width: 100%;">
     <figure>
       <h2 class="eyebrow" id="ranks-title" style="color: #C4C9D2;">03 · From the ranks</h2>
@@ -471,3 +477,7 @@ footer { border-top: 1px solid var(--line); }
 </script>
 
 <script src="js/images.js"></script>
+<script src="js/motion.js"></script>
+
+</body>
+</html>

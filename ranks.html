@@ -1,0 +1,393 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>UNKSO Ranks</title>
+<meta name="description" content="The UNKSO rank structure: every rank from Recruit to Colonel, with insignia and promotion requirements.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;800&family=Geist+Mono:wght@400;500&display=swap">
+<style>
+@font-face { font-family: "UNKSO Gilroy"; font-weight: 300; src: local("Gilroy-Light"), local("Gilroy Light"); }
+@font-face { font-family: "UNKSO Gilroy"; font-weight: 800; src: local("Gilroy-ExtraBold"), local("Gilroy ExtraBold"); }
+/* Ranks: part of PERSCOM, built on the same "Command List" panels. Read-only. */
+:root {
+  --ink: #07090D;
+  --panel: #0F131B;
+  --head: #161B25;
+  --row-hover: #141924;
+  --icon-bg: #1E2431;
+  --line: #222835;
+  --line-strong: #323A4A;
+  --fg: #F5F6F8;
+  --soft: #CDD2DB;
+  --muted: #A3AAB8;
+  --accent: #F07A2E;
+  --on-accent: #07090D;
+  --placeholder-a: #11151D;
+  --placeholder-b: #151A24;
+  --font-display: "UNKSO Gilroy", "Plus Jakarta Sans", system-ui, sans-serif;
+  --font-text: "UNKSO Gilroy", "Plus Jakarta Sans", system-ui, sans-serif;
+  --font-mono: "Geist Mono", ui-monospace, Menlo, monospace;
+  --w-light: 300;
+  --w-heavy: 800;
+  --maxw: 1320px;
+  --gutter: clamp(16px, 4vw, 32px);
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+:root { padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); }
+html { scroll-behavior: smooth; }
+body { margin: 0; background: var(--ink); color: var(--fg); font-family: var(--font-text); font-weight: var(--w-light); font-size: 16px; line-height: 1.55; -webkit-font-smoothing: antialiased; }
+img { max-width: 100%; }
+[hidden] { display: none !important; }
+a { color: inherit; }
+h1, h2, h3 { font-family: var(--font-display); margin: 0; text-wrap: balance; }
+p { margin: 0; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 6px; }
+.wrap { max-width: var(--maxw); margin-inline: auto; padding-inline: var(--gutter); }
+.mono { font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; }
+
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; padding: 0 20px; border-radius: 999px; border: 0; cursor: pointer; text-decoration: none; font-family: var(--font-display); font-weight: var(--w-heavy); font-size: 15px; transition: transform .2s ease, background-color .2s ease, border-color .2s ease; }
+.btn:hover { transform: translateY(-1px); }
+.btn-accent { background: var(--accent); color: var(--on-accent); }
+.btn-ghost { background: transparent; color: var(--fg); border: 1px solid var(--line-strong); }
+.btn-ghost:hover { border-color: var(--muted); }
+.btn-sm { min-height: 36px; padding: 0 14px; font-size: 13px; }
+
+/* ---------- Hero ---------- */
+.hero { position: relative; overflow: hidden; }
+.hero-media { position: absolute; inset: 0; background: repeating-linear-gradient(135deg, var(--placeholder-a) 0 18px, var(--placeholder-b) 18px 36px); }
+.hero-media span { position: absolute; top: 110px; right: var(--gutter); font-family: var(--font-mono); font-size: 12px; color: #7C8495; text-transform: uppercase; }
+.hero-shade { position: absolute; inset: 0; background: linear-gradient(to top, var(--ink) 0%, rgba(7,9,13,0.82) 45%, rgba(7,9,13,0.6) 100%); }
+.nav { position: relative; z-index: 3; display: flex; align-items: center; gap: 24px; padding-block: 24px; }
+.nav .logo img { display: block; height: 40px; width: auto; }
+.nav-links { display: flex; align-items: center; gap: 4px; margin: 0 0 0 auto; padding: 0; list-style: none; }
+.nav-links a { display: inline-flex; align-items: center; min-height: 44px; padding: 0 14px; text-decoration: none; color: #D5D9E0; font-size: 15px; }
+.nav-links a:hover, .nav-links a[aria-current="page"] { color: #FFFFFF; }
+.nav-links a[aria-current="page"] { box-shadow: inset 0 -2px 0 var(--accent); }
+.nav-links .btn { margin-left: 8px; }
+.menu-btn { display: none; margin-left: auto; width: 44px; height: 44px; border-radius: 999px; background: transparent; border: 1px solid rgba(243,244,246,0.35); color: var(--fg); cursor: pointer; align-items: center; justify-content: center; }
+.mobile-menu { position: relative; z-index: 3; margin-bottom: 16px; background: rgba(14,18,26,0.96); border: 1px solid var(--line); border-radius: 16px; padding: 8px; }
+.mobile-menu a { display: block; padding: 14px 16px; text-decoration: none; border-radius: 10px; }
+.mobile-menu a:hover { background: var(--head); }
+.mobile-menu .enlist { color: var(--accent); font-weight: var(--w-heavy); }
+
+.hero-body { position: relative; z-index: 2; padding-block: clamp(40px, 7vw, 88px) 40px; display: flex; flex-wrap: wrap; gap: 32px; align-items: flex-end; justify-content: space-between; }
+.hero-title { flex: 1 1 520px; min-width: 0; }
+.signal { display: inline-flex; align-items: center; gap: 12px; margin-bottom: 16px; color: var(--accent); }
+.signal::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--accent); }
+.hero h1 { font-weight: var(--w-light); color: var(--fg); font-size: clamp(44px, 6.6vw, 88px); line-height: 0.98; letter-spacing: -0.04em; }
+.hero h1 strong { font-weight: var(--w-heavy); color: var(--accent); letter-spacing: -0.035em; }
+.hero-title p { margin-top: 18px; color: var(--soft); max-width: 58ch; }
+.search { flex: 0 1 440px; min-width: 0; display: flex; flex-direction: column; gap: 10px; }
+.search-box { position: relative; }
+.search-box svg { position: absolute; left: 18px; top: 50%; transform: translateY(-50%); color: var(--muted); pointer-events: none; }
+.search input { width: 100%; min-height: 56px; padding: 0 18px 0 50px; border-radius: 999px; background: rgba(15,19,27,0.9); border: 1px solid var(--line-strong); color: var(--fg); font: inherit; font-size: 16px; }
+.search input::placeholder { color: #737B8B; }
+.search input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(240,122,46,0.22); }
+.search .hint { color: var(--muted); font-size: 13px; padding-left: 18px; }
+
+/* Jump bar */
+.jump { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: rgba(7,9,13,0.94); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border-block: 1px solid var(--line); }
+.jump-inner { display: flex; gap: 8px; overflow-x: auto; padding-block: 10px; scrollbar-width: none; }
+.jump-inner::-webkit-scrollbar { display: none; }
+.jump a { flex: none; display: inline-flex; align-items: center; gap: 10px; min-height: 40px; padding: 0 16px; border-radius: 999px; text-decoration: none; color: var(--soft); font-size: 14px; border: 1px solid var(--line); background: var(--panel); }
+.jump a:hover { color: var(--fg); border-color: var(--line-strong); }
+.jump a.active { color: var(--fg); border-color: var(--muted); }
+
+/* Read-only notice */
+.notice { display: flex; align-items: center; gap: 14px; padding: 16px 20px; border-radius: 14px; background: var(--panel); border: 1px solid var(--line); color: var(--soft); font-size: 15px; }
+.notice svg { flex: none; color: var(--muted); }
+.notice strong { color: var(--fg); font-family: var(--font-display); font-weight: var(--w-heavy); }
+
+/* ---------- Layout ---------- */
+.layout { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: clamp(28px, 3.5vw, 48px); padding-block: 40px 120px; align-items: start; }
+.sections { display: flex; flex-direction: column; gap: 32px; min-width: 0; }
+
+.category { scroll-margin-top: 76px; border: 1px solid var(--line); border-radius: 16px; overflow: hidden; background: var(--panel); }
+.cat-head { display: flex; align-items: center; gap: 18px; padding: 20px 24px; background: var(--head); color: #FFFFFF; }
+.cat-icon { flex: none; width: 52px; height: 52px; border-radius: 12px; display: grid; place-items: center; color: #FFFFFF; background: var(--icon-bg); border: 1px solid var(--line-strong); }
+.cat-text { flex: 1 1 auto; min-width: 0; }
+.cat-head h2 { font-weight: var(--w-heavy); font-size: clamp(24px, 2.4vw, 30px); letter-spacing: -0.02em; line-height: 1.1; color: #FFFFFF; }
+.cat-head p { color: var(--soft); margin-top: 4px; font-size: 15px; }
+.cat-status { flex: none; font-family: var(--font-mono); font-size: 12px; font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase; color: #FFFFFF; }
+footer { border-top: 1px solid var(--line); }
+.foot { display: flex; flex-wrap: wrap; gap: 16px 32px; justify-content: space-between; padding-block: 32px; color: var(--muted); font-size: 15px; }
+.foot nav { display: flex; flex-wrap: wrap; gap: 8px 24px; }
+.foot a { color: var(--soft); text-decoration: none; }
+.foot a:hover { color: var(--fg); }
+
+/* ---------- Ranks page ---------- */
+.crumbs { display: flex; align-items: center; gap: 10px; margin-bottom: 18px; color: var(--muted); font-size: 14px; }
+.crumbs a { color: var(--soft); text-decoration: none; }
+.crumbs a:hover { color: var(--fg); text-decoration: underline; }
+.hero-facts { flex: 0 1 auto; display: flex; gap: 12px; flex-wrap: wrap; }
+.hero-facts div { min-width: 112px; padding: 16px 20px; border-radius: 14px; background: rgba(15,19,27,0.9); border: 1px solid var(--line); }
+.hero-facts strong { display: block; font-family: var(--font-display); font-weight: var(--w-heavy); font-size: 32px; line-height: 1; letter-spacing: -0.02em; }
+.hero-facts span { display: block; margin-top: 6px; color: var(--muted); font-size: 13px; }
+
+.page { display: flex; flex-direction: column; gap: 32px; padding-block: 40px 120px; }
+
+/* Ladder: every rank in order, lowest to highest */
+.ladder { padding: 22px 24px; border-radius: 16px; background: var(--panel); border: 1px solid var(--line); }
+.ladder-head { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px 24px; align-items: baseline; margin-bottom: 16px; }
+.ladder-head h2 { font-weight: var(--w-heavy); font-size: 20px; }
+.ladder-head p { color: var(--muted); font-size: 14px; }
+.ladder ol { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 18px 14px; }
+.ladder .grp { display: flex; flex-direction: column; gap: 10px; }
+.ladder .grp-name { font-family: var(--font-mono); font-size: 11px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); padding-bottom: 8px; border-bottom: 2px solid var(--line-strong); }
+.ladder .grp ul { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px; }
+.ladder a { display: grid; place-items: center; min-width: 52px; min-height: 40px; padding: 0 10px; border-radius: 8px; background: var(--head); border: 1px solid var(--line); text-decoration: none; font-family: var(--font-mono); font-size: 13px; color: var(--soft); transition: border-color .15s ease, color .15s ease, background-color .15s ease; }
+.ladder a:hover { border-color: var(--accent); color: var(--fg); }
+
+/* Rank groups reuse the Command List panel */
+.cat-count { flex: none; font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; color: #FFFFFF; }
+.rank-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(232px, 1fr)); border-top: 1px solid var(--line); margin-bottom: -1px; }
+.rank { position: relative; display: flex; flex-direction: column; background: var(--panel); box-shadow: 1px 0 0 var(--line), 0 1px 0 var(--line); scroll-margin-top: 90px; transition: background-color .15s ease; }
+.rank:hover { background: var(--row-hover); }
+.rank:target { box-shadow: inset 0 0 0 2px var(--accent); }
+.insignia { position: relative; height: 150px; margin: 18px 18px 0; border-radius: 12px; padding: 22px; background-origin: content-box;
+  background-color: var(--placeholder-a); background-image: repeating-linear-gradient(135deg, var(--placeholder-a) 0 14px, var(--placeholder-b) 14px 28px); }
+.insignia.has-img { background-color: #0B0E14; }
+.insignia span { position: absolute; inset: 0; display: grid; place-items: center; text-align: center; font-family: var(--font-mono); font-size: 11px; letter-spacing: .06em; text-transform: uppercase; color: #7C8495; }
+.insignia span b { display: block; font-family: var(--font-display); font-weight: var(--w-heavy); font-size: 30px; letter-spacing: -0.01em; color: #3A4252; margin-bottom: 2px; }
+.rank-body { display: flex; flex-direction: column; gap: 6px; padding: 16px 20px 22px; }
+.rank-meta { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.abbr { font-family: var(--font-mono); font-size: 13px; font-weight: 500; letter-spacing: .06em; color: var(--accent); }
+.grade { font-family: var(--font-mono); font-size: 11px; letter-spacing: .06em; color: var(--muted); padding: 2px 8px; border-radius: 999px; border: 1px solid var(--line-strong); }
+.rank h3 { font-weight: var(--w-heavy); font-size: 19px; line-height: 1.25; }
+.rank p { color: var(--muted); font-size: 14px; line-height: 1.5; }
+.held { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+.held span { font-size: 12px; color: var(--soft); padding: 3px 10px; border-radius: 999px; background: #1B212C; }
+
+/* Promotion requirements */
+.promo-body { padding: 8px 24px 24px; }
+.promo-body > p { color: var(--muted); font-size: 15px; max-width: 70ch; padding: 14px 0 18px; }
+.table-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 12px; }
+table { width: 100%; border-collapse: collapse; min-width: 560px; font-size: 15px; }
+th, td { text-align: left; padding: 14px 18px; border-top: 1px solid var(--line); vertical-align: top; }
+thead th { border-top: 0; background: var(--head); font-family: var(--font-mono); font-size: 11px; font-weight: 500; letter-spacing: .06em; text-transform: uppercase; color: var(--soft); }
+td:first-child { font-family: var(--font-display); font-weight: var(--w-heavy); color: var(--fg); white-space: nowrap; }
+td { color: var(--soft); }
+td.tbc { color: var(--muted); }
+
+@media (max-width: 600px) {
+  .rank-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); }
+  .insignia { height: 120px; margin: 14px 14px 0; padding: 16px; }
+  .rank-body { padding: 14px 14px 18px; }
+  .rank h3 { font-size: 17px; }
+  .promo-body { padding: 4px 16px 18px; }
+  .ladder { padding: 18px; }
+}
+@media (max-width: 860px) {
+  .nav-links { display: none; }
+  .menu-btn { display: inline-flex; }
+}
+@media (max-width: 600px) {
+  .cat-head { flex-wrap: wrap; padding: 18px; gap: 14px; }
+  .cat-icon { width: 44px; height: 44px; }
+  .cat-count { order: 4; width: 100%; }
+}
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } * { transition: none !important; } }
+.foot { align-items: center; }
+.to-top { display: inline-flex; align-items: center; gap: 10px; min-height: 44px; padding: 0 20px; border-radius: 999px; background: transparent; border: 1px solid #323A4A; color: #F5F6F8; font-family: var(--font-display); font-weight: 800; font-size: 15px; cursor: pointer; transition: border-color .2s ease, transform .2s ease; }
+.to-top:hover { border-color: #A3AAB8; transform: translateY(-1px); }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="hero-media" aria-hidden="true" data-img="images/header-ranks.jpg"><span>Still from clan footage</span></div>
+  <div class="hero-shade" aria-hidden="true"></div>
+  <div class="wrap" style="position: relative; z-index: 3;">
+    <nav class="nav" aria-label="Main">
+      <a class="logo" href="./" aria-label="UNKSO home"><img src="unkso-logo.png" alt="UNKSO" width="160" height="40"></a>
+      <ul class="nav-links">
+        <li><a href="./#unit">The Clan</a></li>
+        <li><a href="./#divisions">Companies</a></li>
+        <li><a href="forums.html">Forums</a></li>
+        <li><a href="perscom.html" aria-current="page">PERSCOM</a></li>
+        <li><a href="admin.html" aria-label="Sign in" title="Sign in"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg></a></li>
+        <li><a class="btn btn-ghost" href="apply.html">Enlist</a></li>
+      </ul>
+      <button class="menu-btn" id="menu-btn" type="button" aria-expanded="false" aria-controls="mobile-menu" aria-label="Open menu">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+      </button>
+    </nav>
+    <div class="mobile-menu" id="mobile-menu" hidden>
+      <a href="./#unit">The Clan</a>
+      <a href="./#divisions">Companies</a>
+      <a href="forums.html">Forums</a>
+      <a href="perscom.html" aria-current="page">PERSCOM</a>
+      <a href="admin.html" style="display: flex; align-items: center; gap: 10px;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>Sign in</a>
+      <a class="enlist" href="apply.html">Enlist</a>
+    </div>
+  </div>
+  <div class="wrap hero-body">
+    <div class="hero-title">
+      <nav class="crumbs" aria-label="Breadcrumb"><a href="perscom.html">PERSCOM</a><span aria-hidden="true">/</span><span aria-current="page">Ranks</span></nav>
+      <div class="signal mono">Personnel Command · Rank structure</div>
+      <h1><strong>UNKSO</strong> Ranks.</h1>
+      <p>Every rank in the clan, from Recruit to Colonel. Ranks are earned through attendance, training and leadership, never handed out.</p>
+    </div>
+    <div class="hero-facts" aria-label="At a glance">
+      <div><strong id="n-ranks">24</strong><span>ranks</span></div>
+      <div><strong>4</strong><span>rank groups</span></div>
+    </div>
+  </div>
+</header>
+
+<nav class="jump" aria-label="Rank groups">
+  <div class="wrap jump-inner" id="jump"></div>
+</nav>
+
+<main class="wrap page">
+  <div class="notice" role="note">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+    <span><strong>Read only.</strong> Ranks and promotion requirements are set by Command. Questions about your next promotion? Ask your Squad Leader.</span>
+  </div>
+
+  <section class="ladder" aria-labelledby="ladder-title">
+    <div class="ladder-head">
+      <h2 id="ladder-title">The full ladder</h2>
+      <p>Lowest to highest. Select a rank to jump to it.</p>
+    </div>
+    <ol id="ladder"></ol>
+  </section>
+
+  <div id="groups" style="display: flex; flex-direction: column; gap: 32px;"></div>
+
+  <section class="category" id="promotion" aria-labelledby="h-promotion">
+    <div class="cat-head">
+      <span class="cat-icon"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 17 9 11l4 4 8-8"/><path d="M15 7h6v6"/></svg></span>
+      <div class="cat-text"><h2 id="h-promotion">Promotion Requirements</h2><p>What it takes to move up. Promotions are posted monthly by Command.</p></div>
+    </div>
+    <div class="promo-body">
+      <p>The minimum time in rank is the earliest you can be considered for promotion, not a guarantee.</p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th scope="col">Promotion to</th><th scope="col">Minimum time in rank</th><th scope="col">Also needs</th></tr></thead>
+          <tbody id="promo-rows"></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap foot">
+    <span>© Unknown Soldiers · Built by our Engineering Department</span>
+    <button class="to-top" type="button" onclick="window.scrollTo({ top: 0, behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' })">
+      Back to top
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5M6 11l6-6 6 6"/></svg>
+    </button>
+  </div>
+</footer>
+
+<script src="js/store.js"></script>
+<script>
+(function () {
+  // Rank data, lowest to highest within each group.
+  // img: images/rank-<abbr>.png (transparent PNG, square). Until uploaded, a placeholder shows.
+  var GROUPS = [
+    { id: 'enlisted', title: 'Enlisted', desc: 'Where everyone starts. Learn the basics, build your record and become a dependable part of your squad.', icon: '<path d="m6 15 6-5 6 5"/>', ranks: [
+      ['RCT', 'Recruit', '—', 'Accepted applicant working through Basic Combat Training.'],
+      ['PVT', 'Private', 'E-1', 'Has passed Basic Combat Training and is a full member of their company.'],
+      ['PV2', 'Private Second Class', 'E-2', 'Settling into the squad and building a regular FTX record.'],
+      ['PFC', 'Private First Class', 'E-3', 'A dependable member of the squad who knows how we operate.'],
+      ['SPC', 'Specialist', 'E-4', 'An experienced member, often trained in a specialist role.']
+    ] },
+    { id: 'nco', title: 'Non-Commissioned Officers', desc: 'The backbone of the clan. NCOs lead teams and squads, train new members and keep standards high.', icon: '<path d="m6 10 6-5 6 5M6 15l6-5 6 5M6 20l6-5 6 5"/>', ranks: [
+      ['CPL', 'Corporal', 'E-4', 'Junior NCO who supports the team leader and helps newer members.'],
+      ['SGT', 'Sergeant', 'E-5', 'Leads a fire team or squad during FTXs.'],
+      ['SSG', 'Staff Sergeant', 'E-6', 'Senior squad leader, responsible for a squad’s members and training.'],
+      ['SFC', 'Sergeant First Class', 'E-7', 'Senior NCO who supports company leadership.'],
+      ['MSG', 'Master Sergeant', 'E-8', 'Senior NCO with clan-level staff responsibilities.'],
+      ['1SG', 'First Sergeant', 'E-8', 'The senior NCO of a company, responsible for its members and standards.'],
+      ['SGM', 'Sergeant Major', 'E-9', 'Senior NCO who advises Command on clan-wide matters.'],
+      ['CSM', 'Command Sergeant Major', 'E-9', 'The clan’s most senior NCO and adviser to the Commanding Officer.']
+    ] },
+    { id: 'warrant', title: 'Warrant Officers', desc: 'Specialists who run the departments and systems that keep the clan going.', icon: '<path d="M12 3 4 6v6c0 5 3.5 8 8 9 4.5-1 8-4 8-9V6Z"/>', ranks: [
+      ['WO1', 'Warrant Officer 1', 'W-1', 'Specialist responsible for a department or function.'],
+      ['CW2', 'Chief Warrant Officer 2', 'W-2', 'Experienced specialist who leads work within a department.'],
+      ['CW3', 'Chief Warrant Officer 3', 'W-3', 'Senior specialist who oversees a department.'],
+      ['CW4', 'Chief Warrant Officer 4', 'W-4', 'Senior specialist who advises Command.'],
+      ['CW5', 'Chief Warrant Officer 5', 'W-5', 'The most senior warrant officer in the clan.']
+    ] },
+    { id: 'officers', title: 'Officers', desc: 'Officers command companies and run the clan as a whole.', icon: '<path d="M8 4v16M16 4v16"/>', ranks: [
+      ['2LT', 'Second Lieutenant', 'O-1', 'Junior officer, often leading or commanding a company.'],
+      ['1LT', 'First Lieutenant', 'O-2', 'Commands a company or serves as its Executive Officer.'],
+      ['CPT', 'Captain', 'O-3', 'Experienced company commander or staff officer.'],
+      ['MAJ', 'Major', 'O-4', 'Senior staff officer within Command.'],
+      ['LTC', 'Lieutenant Colonel', 'O-5', 'Commanding Officer of UNKSO.'],
+      ['COL', 'Colonel', 'O-6', 'The highest rank in UNKSO.']
+    ] }
+  ];
+
+  // Promotion requirements: placeholders until Command confirms them.
+  var PROMOTIONS = [
+    ['PVT', 'None', 'Pass Basic Combat Training'],
+    ['PV2', '[TBC]', '[TBC]'],
+    ['PFC', '[TBC]', '[TBC]'],
+    ['SPC', '[TBC]', '[TBC]'],
+    ['CPL', '[TBC]', '[TBC]'],
+    ['SGT', '[TBC]', '[TBC]'],
+    ['SSG and above', '[TBC]', '[TBC]'],
+    ['Warrant Officers and Officers', '[TBC]', '[TBC]']
+  ];
+
+  function esc(s) { return String(s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+  function slug(a) { return a.toLowerCase(); }
+
+  // Members currently holding each rank (from the same data the Console edits)
+  var holders = {};
+  if (window.UNKSO && UNKSO.list) {
+    UNKSO.list().forEach(function (m) { (holders[m.rank] = holders[m.rank] || []).push(m); });
+  }
+
+  var total = 0, ladder = '', groups = '', jump = '';
+  GROUPS.forEach(function (g) {
+    total += g.ranks.length;
+    jump += '<a href="#' + g.id + '">' + esc(g.title) + '</a>';
+    groups += '<section class="category" id="' + g.id + '" aria-labelledby="h-' + g.id + '">' +
+      '<div class="cat-head"><span class="cat-icon"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + g.icon + '</svg></span>' +
+      '<div class="cat-text"><h2 id="h-' + g.id + '">' + esc(g.title) + '</h2><p>' + esc(g.desc) + '</p></div>' +
+      '<span class="cat-count">' + g.ranks.length + ' ranks</span></div>' +
+      '<div class="rank-grid">' + g.ranks.map(function (r) {
+        var who = holders[r[0]] || [];
+        return '<article class="rank" id="r-' + slug(r[0]) + '" aria-labelledby="t-' + slug(r[0]) + '">' +
+          '<div class="insignia" data-img="images/rank-' + slug(r[0]) + '.png" data-img-fit="contain" role="img" aria-label="' + esc(r[1]) + ' insignia"><span><span style="position: static; display: block;"><b>' + esc(r[0]) + '</b>Insignia</span></span></div>' +
+          '<div class="rank-body"><div class="rank-meta"><span class="abbr">' + esc(r[0]) + '</span><span class="grade">' + esc(r[2]) + '</span></div>' +
+          '<h3 id="t-' + slug(r[0]) + '">' + esc(r[1]) + '</h3><p>' + esc(r[3]) + '</p>' +
+          (who.length ? '<div class="held" aria-label="Held by">' + who.map(function (m) { return '<span>' + esc(UNKSO.displayName(m)) + '</span>'; }).join('') + '</div>' : '') +
+          '</div></article>';
+      }).join('') + '</div></section>';
+    ladder += '<li class="grp"><span class="grp-name">' + esc(g.id === 'nco' ? 'NCOs' : g.title) + '</span><ul>' +
+      g.ranks.map(function (r) { return '<li><a href="#r-' + slug(r[0]) + '" title="' + esc(r[1]) + '">' + esc(r[0]) + '</a></li>'; }).join('') + '</ul></li>';
+  });
+  jump += '<a href="#promotion">Promotion Requirements</a>';
+
+  document.getElementById('groups').innerHTML = groups;
+  document.getElementById('ladder').innerHTML = ladder;
+  document.getElementById('jump').innerHTML = jump;
+  document.getElementById('n-ranks').textContent = total;
+  document.getElementById('promo-rows').innerHTML = PROMOTIONS.map(function (p) {
+    return '<tr><td>' + esc(p[0]) + '</td>' + [p[1], p[2]].map(function (v) {
+      return v === '[TBC]' ? '<td class="tbc">To be confirmed</td>' : '<td>' + esc(v) + '</td>';
+    }).join('') + '</tr>';
+  }).join('');
+
+  // Mobile menu
+  var mb = document.getElementById('menu-btn'), mm = document.getElementById('mobile-menu');
+  if (mb && mm) mb.addEventListener('click', function () {
+    var open = mm.hidden; mm.hidden = !open; mb.setAttribute('aria-expanded', String(open));
+    mb.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+  });
+})();
+</script>
+<script src="js/images.js"></script>
+<script src="js/motion.js"></script>
+</body>
+</html>

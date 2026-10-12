@@ -16,8 +16,10 @@
     var img = new Image();
     img.onload = function () {
       el.style.backgroundImage = 'url("' + src + '")';
-      el.style.backgroundSize = 'cover';
+      // data-img-fit="contain" shows the whole image (rank insignia); default fills the frame
+      el.style.backgroundSize = el.getAttribute('data-img-fit') || 'cover';
       el.style.backgroundPosition = 'center';
+      el.style.backgroundRepeat = 'no-repeat';
       el.classList.add('has-img');
     };
     img.src = src;

@@ -128,6 +128,9 @@ main { padding-bottom: clamp(72px, 9vw, 120px); }
 /* FTX cards */
 .ftx-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
 .ftx { display: flex; flex-direction: column; border-radius: 16px; overflow: hidden; background: var(--panel); border: 1px solid var(--line); }
+.ftx { position: relative; }
+.ftx[data-tilt]::before { z-index: 1; }
+.ftx-body { position: relative; z-index: 2; }
 .ftx-art { position: relative; aspect-ratio: 16 / 9; max-width: 100%; background: repeating-linear-gradient(135deg, var(--placeholder-a) 0 14px, var(--placeholder-b) 14px 28px); }
 .ftx-art span { position: absolute; left: 14px; bottom: 12px; font-family: var(--font-mono); font-size: 11px; color: #7C8495; text-transform: uppercase; }
 .ftx-body { padding: 22px; display: flex; flex-direction: column; gap: 10px; align-items: flex-start; }
@@ -296,7 +299,7 @@ td.none { color: var(--muted); text-align: center; padding: 24px 16px; }
       <p>A taste of the field training exercises the company runs on Sundays.</p>
     </div>
     <div class="ftx-grid">
-      <article class="ftx">
+      <article class="ftx" data-tilt>
         <div class="ftx-art" aria-hidden="true" data-img="images/delta-ftx-1.jpg"><span>FTX screenshot</span></div>
         <div class="ftx-body">
           <span class="pill">Close quarters</span>
@@ -305,7 +308,7 @@ td.none { color: var(--muted); text-align: center; padding: 24px 16px; }
           <ul class="obj"><li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 5 5 9-10"/></svg><span>Agree an entry route and extract before deploy</span></li><li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 5 5 9-10"/></svg><span>Call every contact by direction and floor</span></li><li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 5 5 9-10"/></svg><span>Extract together, with no solo exits</span></li></ul>
         </div>
       </article>
-      <article class="ftx">
+      <article class="ftx" data-tilt>
         <div class="ftx-art" aria-hidden="true" data-img="images/delta-ftx-2.jpg"><span>FTX screenshot</span></div>
         <div class="ftx-body">
           <span class="pill">Squad raid</span>
@@ -314,7 +317,7 @@ td.none { color: var(--muted); text-align: center; padding: 24px 16px; }
           <ul class="obj"><li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 5 5 9-10"/></svg><span>Follow the agreed route and checkpoints</span></li><li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 5 5 9-10"/></svg><span>Keep a rear guard watching the squad’s back</span></li><li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 5 5 9-10"/></svg><span>Reach the primary extract, or fall back to the secondary</span></li></ul>
         </div>
       </article>
-      <article class="ftx">
+      <article class="ftx" data-tilt>
         <div class="ftx-art" aria-hidden="true" data-img="images/delta-ftx-3.jpg"><span>FTX screenshot</span></div>
         <div class="ftx-body">
           <span class="pill">Advanced</span>
@@ -455,5 +458,6 @@ td.none { color: var(--muted); text-align: center; padding: 24px 16px; }
 })();
 </script>
 <script src="js/images.js"></script>
+<script src="js/motion.js"></script>
 </body>
 </html>
